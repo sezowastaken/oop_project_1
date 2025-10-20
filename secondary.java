@@ -103,6 +103,8 @@ public class secondary {
                     break;
                 }
             }
+
+            //todo burası yanlış tersten yazıyor mantıklı bir çözüm bul
             for (int i = n; i >= 2; i--) {
                 if (prime[i] && count == 4) {
                     System.out.println(i);
@@ -134,7 +136,35 @@ public class secondary {
     }
 
     public static void sundaram(int n) {
-        
+        boolean[] marked = new boolean[n/2 + 1];
+        long startTime = System.nanoTime();
+
+        for (int i = 1; i <= n/2; i++) {
+            for (int j = i; (i + j + (2 * i * j)) <= (n/2); j++){
+                marked[i+j+(i*j*2)] = true;
+                
+            }
+        }
+        Long endTime = System.nanoTime();
+
+        System.out.print("2");
+        for (int i = 1; i <= n/2; i++) {
+            if (!marked[i]) {
+                if (2* i + 1 == 2) {
+                    continue;
+                } else if (2 * i + 1 <= n)
+                    System.out.print(", " +(2 * i + 1));
+            }
+        }
+        System.out.println();
+        Long totalTime = endTime - startTime;
+        System.out.println("Time taken to compute primes up to " + n + ": " + totalTime + " nanoseconds");
+        System.out.println("-------------------------------");
+
+    }
+
+    public static void atkin(int n) {
+
     }
 }
 
