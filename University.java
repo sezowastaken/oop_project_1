@@ -2,24 +2,37 @@ import java.util.*;
 
 /**
  * CMPE343 – Project #1 – Section D (University): Connect Four (Console)
- * - Board sizes: 5x4, 6x5, 7x6
- * - Modes: Single-player (vs Computer) or Two-players
- * - Features: input validation, clear screen, quit, win/draw detection, simple
- * AI
+ * <p>
+ * Implements a console-based Connect Four game.
+ * <ul>
+ * <li>Board sizes: 5x4, 6x5, 7x6</li>
+ * <li>Modes: Single-player (vs Computer) or Two-players</li>
+ * </ul>
+ *
+ * @author Tunahan Tuze
  */
 public class University {
 
     private static final Scanner SC = new Scanner(System.in);
 
+    /**
+     * The main entry point for the program.
+     * Runs the Connect Four menu and prints a farewell message upon exit.
+     *
+     * @param args Command line arguments (not used).
+     */
     public static void main(String[] args) {
         connectFourMenu();
-        System.out.println("Çıkılıyor. Görüşmek üzere!");
+        System.out.println("The programme is ending. See you soon!");
     }
 
-    /** University submenu (single section run) */
+    /**
+     * Displays the main menu for Connect Four.
+     * Allows the user to start the game or terminate the program.
+     * Loops until the user chooses to terminate.
+     */
     public static void connectFourMenu() {
         while (true) {
-            clearScreen();
             System.out.println("=== D) University == Connect Four ===");
             System.out.println("[1] Start Game");
             System.out.println("[2] Terminate");
@@ -33,22 +46,27 @@ public class University {
                 return;
 
             } else {
+                clearScreen();
                 System.out.println("Invalid choice!");
-                pause();
             }
         }
     }
 
-    /** Main flow: size & mode selection, loop of turns, result */
+    /**
+     * Manages the main game flow.
+     * This method covers:
+     * 1. Board size selection.
+     * 2. Game mode selection (vs Computer or Player vs Player).
+     * 3. The main game loop (turns, moves, win/draw checks).
+     * 4. Displaying the game end result.
+     */
     public static void connectFourFlow() {
         clearScreen();
         System.out.println("Choose board size:");
-        System.out.println("(1) 5x4   (2) 6x5   (3) 7x6");
+        System.out.println("(1) 5x4   (2) 6x5   (3) 7x6");
         int ch = askInt("Choice: ", 1, 3);
         clearScreen();
 
-        // Not: Problem metninde 5×4, 6×5, 7×6 sırasıyla (cols × rows) hissi verebilir.
-        // Biz satır=yükseklik, sütun=genişlik olarak aşağıdaki gibi tanımlarız:
         int rows, cols;
         if (ch == 1) {
             rows = 4;
@@ -61,104 +79,96 @@ public class University {
             cols = 7;
         }
 
-        int mode = 0; // başlangıçta geçersiz
+        int mode = 0;
 
         while (true) {
-            System.out.println("\nMod selection:");
+            System.out.println("Mod selection:");
             System.out.println("(1) Against Computer");
             System.out.println("(2) Player vs Player");
             System.out.print("Choice: ");
             String input = SC.nextLine().trim();
 
-            // sadece tek karakter ve 1–2 arası kontrolü
             if (input.equals("1")) {
                 mode = 1;
-                break; // geçerli seçim, döngüden çık
+                break;
             } else if (input.equals("2")) {
                 mode = 2;
                 break;
             } else {
-                System.out.println("Invalid choice! Please choice 1 or 2.\n");
+                clearScreen();
+                System.out.println("Invalid choice! Please choice 1 or 2.");
             }
         }
 
         clearScreen();
 
-        // tahta ve değişkenlerin hazırlanması
         char[][] board = initializeBoard(rows, cols);
-        boolean p1Turn = true; // Player1 = 'X', Player2/CPU = 'O'
+        boolean p1Turn = true;
 
         while (true) {
             clearScreen();
             displayBoard(board);
 
-            // Sıradaki taş
             char disc;
             if (p1Turn)
                 disc = 'X';
             else
                 disc = 'O';
 
-            // Mod (1 ise CPU var)
             boolean vsCpu = (mode == 1);
 
-            // Kimin sırası?
             if (p1Turn) {
-                System.out.println("Oyuncu 1 (X) hamlede.");
+                System.out.println("Player 1 (X) is on the move.");
             } else {
                 if (vsCpu) {
-                    System.out.println("Bilgisayar (O) hamlede.");
-                    waitMs(1000); // 2 saniye bekle
+                    System.out.println("CPU (O) is on the move.");
+                    waitMs(1000);
                 } else {
-                    System.out.println("Oyuncu 2 (O) hamlede.");
+                    System.out.println("Player 2 (O) is on the move.");
                 }
             }
-            int col = -1; // 0-based sütun
+            int col = -1;
 
             if (!p1Turn && vsCpu) {
-                // === BASİT BİLGİSAYAR: soldan ilk boş sütunu seç ===
+                // NOTE: This is a placeholder AI. It just picks the first available column.
+                // The computerMove method is not currently called in this loop.
                 for (int c = 0; c < cols; c++) {
                     if (!isColumnFull(board, c)) {
                         col = c;
                         break;
                     }
                 }
-                // (col == -1) ise tüm sütunlar doludur; berabere kontrolü aşağıda yapılır.
+
             } else {
-                // === OYUNCU GİRİŞİ ===
-                System.out.print("Sütun (1-" + cols + ") veya Q (vazgeç): ");
+                System.out.print("Column (1-" + cols + ") or Q (quit): ");
                 String in = SC.nextLine().trim();
 
-                // Çekilmek isterse
                 if (in.equalsIgnoreCase("Q")) {
                     if (p1Turn)
-                        System.out.println("Oyuncu 1 oyundan çekildi.");
+                        System.out.println("Player 1 has left the game.");
                     else
-                        System.out.println("Oyuncu 2 oyundan çekildi.");
-                    pause();
-                    break; // oyunu bitir
+                        System.out.println("Player 2 has left the game.");
+
+                    break;
                 }
 
-                // Tek karakter ve 1..cols aralığı mı?
                 if (in.length() == 1 && in.charAt(0) >= '1' && in.charAt(0) <= ('0' + cols)) {
-                    col = (in.charAt(0) - '0') - 1; // 0-based
+                    col = (in.charAt(0) - '0') - 1;
                     if (isColumnFull(board, col)) {
-                        System.out.println("Bu sütun dolu! Başka bir sütun deneyin.");
-                        pause();
+                        System.out.println("This column is full! Try another column.");
+
                         continue;
                     }
                 } else {
-                    System.out.println("Geçersiz giriş. Lütfen 1-" + cols + " arasında bir sayı girin.");
-                    pause();
+                    System.out.println("Invalid entry. Please 1-" + cols + " enter a number between.");
+
                     continue;
                 }
             }
 
-            // Hamleyi uygula
             if (col != -1)
                 dropDisc(board, col, disc);
 
-            // Kazanma / Berabere
             if (checkWinner(board, disc)) {
                 clearScreen();
                 displayBoard(board);
@@ -175,7 +185,7 @@ public class University {
             if (isDraw(board)) {
                 clearScreen();
                 displayBoard(board);
-                System.out.println("Tahta doldu. Berabere!");
+                System.out.println("The board is full. It's a draw!");
                 pause();
                 break;
             }
@@ -185,9 +195,14 @@ public class University {
 
     }
 
-    // ========= Board Utilities =========
-
-    /** Create an empty board filled with spaces. */
+    /**
+     * Creates a new game board of the given dimensions and
+     * fills it with space characters (' ').
+     *
+     * @param rows The number of rows for the board.
+     * @param cols The number of columns for the board.
+     * @return A 2D char array representing the empty board.
+     */
     public static char[][] initializeBoard(int rows, int cols) {
         char[][] b = new char[rows][cols];
         for (int r = 0; r < rows; r++)
@@ -195,12 +210,17 @@ public class University {
         return b;
     }
 
-    /** Render the board with column headers. */
+    /**
+     * Renders the current state of the game board to the console,
+     * including column numbers and grid lines.
+     *
+     * @param board The 2D char array representing the game board.
+     */
     public static void displayBoard(char[][] board) {
         int rows = board.length, cols = board[0].length;
-        System.out.print("  ");
+        System.out.print("  ");
         for (int c = 1; c <= cols; c++)
-            System.out.print(" " + c + "  ");
+            System.out.print(" " + c + "  ");
         System.out.println();
         for (int r = 0; r < rows; r++) {
             System.out.print(" |");
@@ -209,18 +229,30 @@ public class University {
             }
             System.out.println();
         }
-        System.out.print("  ");
+        System.out.print("  ");
         for (int c = 0; c < cols; c++)
             System.out.print("--- ");
         System.out.println();
     }
 
-    /** True if top cell in column is not empty (column full). */
+    /**
+     * Checks if a specific column on the board is full.
+     *
+     * @param board  The game board.
+     * @param column The 0-based index of the column to check.
+     * @return true if the column is full, false otherwise.
+     */
     public static boolean isColumnFull(char[][] board, int column) {
         return board[0][column] != ' ';
     }
 
-    /** Drop disc into the lowest empty row of the selected column. */
+    /**
+     * Drops a player's disc into the lowest available row of the selected column.
+     *
+     * @param board  The game board (will be modified by this method).
+     * @param column The 0-based column index to drop the disc into.
+     * @param disc   The character representing the player's disc ('X' or 'O').
+     */
     public static void dropDisc(char[][] board, int column, char disc) {
         for (int r = board.length - 1; r >= 0; r--) {
             if (board[r][column] == ' ') {
@@ -230,24 +262,35 @@ public class University {
         }
     }
 
-    /** Check winner for 4 in a row (horizontal, vertical, 2 diagonals). */
+    /**
+     * Checks if the specified player (disc) has won the game.
+     * Searches for four in a row horizontally, vertically, and on both diagonals.
+     *
+     * @param b The game board to check.
+     * @param d The disc ('X' or 'O') to check for a win.
+     * @return true if the specified player has won, false otherwise.
+     */
     public static boolean checkWinner(char[][] b, char d) {
         int R = b.length, C = b[0].length;
+
         // horizontal
         for (int r = 0; r < R; r++)
             for (int c = 0; c <= C - 4; c++)
                 if (b[r][c] == d && b[r][c + 1] == d && b[r][c + 2] == d && b[r][c + 3] == d)
                     return true;
+
         // vertical
         for (int c = 0; c < C; c++)
             for (int r = 0; r <= R - 4; r++)
                 if (b[r][c] == d && b[r + 1][c] == d && b[r + 2][c] == d && b[r + 3][c] == d)
                     return true;
+
         // diagonal down-right
         for (int r = 0; r <= R - 4; r++)
             for (int c = 0; c <= C - 4; c++)
                 if (b[r][c] == d && b[r + 1][c + 1] == d && b[r + 2][c + 2] == d && b[r + 3][c + 3] == d)
                     return true;
+
         // diagonal up-right
         for (int r = 3; r < R; r++)
             for (int c = 0; c <= C - 4; c++)
@@ -256,7 +299,13 @@ public class University {
         return false;
     }
 
-    /** True if no empty cell remains in the top row (i.e., all columns full). */
+    /**
+     * Checks if the game is a draw (i.e., the board is full).
+     * This is done by checking if the top row (index 0) has any empty spaces.
+     *
+     * @param b The game board.
+     * @return true if the board is full (draw), false otherwise.
+     */
     public static boolean isDraw(char[][] b) {
         for (int c = 0; c < b[0].length; c++)
             if (b[0][c] == ' ')
@@ -264,33 +313,38 @@ public class University {
         return true;
     }
 
-    // ========= Simple AI (Win/Block/Center/Random) =========
-
     /**
-     * Returns a column index for computer:
-     * 1) If it can win now, do it.
-     * 2) Else if player can win next, block it.
-     * 3) Else prefer center-most valid columns.
-     * 4) Else random among valid.
+     * Determines the computer's next move based on a simple AI strategy.
+     * The strategy priority is:
+     * 1. Win: If the computer (me) can win in one move.
+     * 2. Block: If the opponent (opp) can win in one move.
+     * 3. Center: Prefer columns closest to the center.
+     * 4. Random: Pick a random valid column.
+     *
+     * @param board The current game board.
+     * @param me    The computer's disc character ('O').
+     * @param opp   The opponent's disc character ('X').
+     * @param rng   A Random object for generating random numbers.
+     * @return The 0-based column index for the computer's move.
      */
     public static int computerMove(char[][] board, char me, char opp, Random rng) {
         int cols = board[0].length;
 
-        // 1) Kazanma hamlesi: kendi taşını bırakıp kazanabiliyor musun?
+        // 1) Win move: Can I win by dropping my disc?
         for (int c = 0; c < cols; c++) {
             if (!isColumnFull(board, c) && leadsToWin(board, c, me)) {
                 return c;
             }
         }
 
-        // 2) Engelleme hamlesi: rakip bir sütuna oynarsa kazanır mı?
+        // 2) Block move: Can the opponent win if they play in a column?
         for (int c = 0; c < cols; c++) {
             if (!isColumnFull(board, c) && leadsToWin(board, c, opp)) {
                 return c;
             }
         }
 
-        // 3) Merkeze yakın sütunu tercih et (0 tabanlı)
+        // 3) Prefer center column (0-based)
         int center = cols / 2;
         for (int d = 0; d < cols; d++) {
             int left = center - d;
@@ -302,27 +356,35 @@ public class University {
                 return right;
         }
 
-        // 4) Rastgele geçerli sütun seç (diziyle)
+        // 4) Random valid column (using an array)
         int[] validCols = new int[cols];
         int count = 0;
 
         for (int c = 0; c < cols; c++) {
             if (!isColumnFull(board, c)) {
-                validCols[count] = c; // dizide sakla
+                validCols[count] = c; // store in array
                 count++;
             }
         }
 
         if (count > 0) {
-            int randomIndex = rng.nextInt(count); // sadece geçerli sütunlar arasından
+            int randomIndex = rng.nextInt(count); // only among valid columns
             return validCols[randomIndex];
         }
 
-        // Hiç geçerli sütun yoksa (tahta doluysa)
+        // No valid columns left (board is full)
         return 0;
     }
 
-    /** Simulate dropping 'disc' into column c and check if that makes a win. */
+    /**
+     * Simulates whether dropping a disc into a column will result in a win.
+     * This method temporarily modifies the board and then undoes the move.
+     *
+     * @param board The game board to test.
+     * @param c     The 0-based column index to test.
+     * @param disc  The disc ('X' or 'O') to test.
+     * @return true if this move results in a win, false otherwise.
+     */
     public static boolean leadsToWin(char[][] board, int c, char disc) {
         int r = findDropRow(board, c);
         if (r == -1)
@@ -333,7 +395,15 @@ public class University {
         return win;
     }
 
-    /** Find the row index where a disc would land in column c; -1 if full. */
+    /**
+     * Finds the top-most (lowest index) empty row where a disc would land in a
+     * given column.
+     *
+     * @param board The game board to check.
+     * @param c     The 0-based column index to check.
+     * @return The 0-based row index where the disc would land, or -1 if the column
+     *         is full.
+     */
     public static int findDropRow(char[][] board, int c) {
         for (int r = board.length - 1; r >= 0; r--) {
             if (board[r][c] == ' ')
@@ -342,24 +412,42 @@ public class University {
         return -1;
     }
 
-    // ========= Console helpers =========
+    /**
+     * Clears the console screen using ANSI escape codes.
+     */
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
 
+    /**
+     * Pauses program execution for a specified number of milliseconds
+     * using a busy-wait loop.
+     *
+     * @param ms The duration to wait in milliseconds.
+     */
     public static void waitMs(long ms) {
         long end = System.currentTimeMillis() + ms;
         while (System.currentTimeMillis() < end) {
-            // bekleme (boş döngü)
+            // busy waiting
         }
     }
 
+    /**
+     * Pauses the program and waits for the user to press Enter to continue.
+     */
     public static void pause() {
-        System.out.print("Devam etmek için Enter'a basın...");
+        System.out.print("Press Enter to continue...");
         SC.nextLine();
     }
 
+    /**
+     * 
+     * Puts the current thread to sleep for a specified number of milliseconds.
+     * Catches and ignores any InterruptedException.
+     *
+     * @param ms The sleep duration in milliseconds.
+     */
     public static void sleep(long ms) {
         try {
             Thread.sleep(ms);
@@ -367,13 +455,21 @@ public class University {
         }
     }
 
+    /**
+     * Prompts the user to enter an integer within a specified range [min, max].
+     * Keeps prompting until a valid number in the range is entered.
+     *
+     * @param prompt The message to display to the user.
+     * @param min    The minimum acceptable integer value (inclusive).
+     * @param max    The maximum acceptable integer value (inclusive).
+     * @return The valid integer entered by the user.
+     */
     public static int askInt(String prompt, int min, int max) {
         while (true) {
             System.out.print(prompt);
             String input = SC.nextLine().trim();
 
-            // Sayı mı kontrolü (negatifleri de desteklemek istersen '-' kontrolü
-            // eklenebilir)
+            // Check if numeric
             boolean numeric = true;
             for (int i = 0; i < input.length(); i++) {
                 char ch = input.charAt(i);
@@ -384,23 +480,23 @@ public class University {
             }
 
             if (!numeric || input.isEmpty()) {
-                System.out.println("Hatalı giriş. Lütfen bir sayı girin.");
-                continue; // tekrar sor
+                System.out.println("Incorrect entry. Please enter a number.");
+                continue; // ask again
             }
 
-            // String'i sayıya çevir (Integer.parseInt yerine elle)
+            // Convert string to number (manually)
             int value = 0;
             for (int i = 0; i < input.length(); i++) {
                 value = value * 10 + (input.charAt(i) - '0');
             }
 
-            // Aralık kontrolü
+            // Check range
             if (value < min || value > max) {
-                System.out.println("Sayı " + min + " ile " + max + " arasında olmalı.");
+                System.out.println("Number " + min + " with " + max + " should be between.");
                 continue;
             }
 
-            return value; // geçerli giriş
+            return value;
         }
     }
 
