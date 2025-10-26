@@ -63,7 +63,7 @@ public class University {
     public static void connectFourFlow() {
         clearScreen();
         System.out.println("Choose board size:");
-        System.out.println("(1) 5x4   (2) 6x5   (3) 7x6");
+        System.out.println("(1) 5x4  (2) 6x5  (3) 7x6");
         int ch = askInt("Choice: ", 1, 3);
         clearScreen();
 
@@ -130,8 +130,7 @@ public class University {
             int col = -1;
 
             if (!p1Turn && vsCpu) {
-                // NOTE: This is a placeholder AI. It just picks the first available column.
-                // The computerMove method is not currently called in this loop.
+
                 for (int c = 0; c < cols; c++) {
                     if (!isColumnFull(board, c)) {
                         col = c;
@@ -273,25 +272,21 @@ public class University {
     public static boolean checkWinner(char[][] b, char d) {
         int R = b.length, C = b[0].length;
 
-        // horizontal
         for (int r = 0; r < R; r++)
             for (int c = 0; c <= C - 4; c++)
                 if (b[r][c] == d && b[r][c + 1] == d && b[r][c + 2] == d && b[r][c + 3] == d)
                     return true;
 
-        // vertical
         for (int c = 0; c < C; c++)
             for (int r = 0; r <= R - 4; r++)
                 if (b[r][c] == d && b[r + 1][c] == d && b[r + 2][c] == d && b[r + 3][c] == d)
                     return true;
 
-        // diagonal down-right
         for (int r = 0; r <= R - 4; r++)
             for (int c = 0; c <= C - 4; c++)
                 if (b[r][c] == d && b[r + 1][c + 1] == d && b[r + 2][c + 2] == d && b[r + 3][c + 3] == d)
                     return true;
 
-        // diagonal up-right
         for (int r = 3; r < R; r++)
             for (int c = 0; c <= C - 4; c++)
                 if (b[r][c] == d && b[r - 1][c + 1] == d && b[r - 2][c + 2] == d && b[r - 3][c + 3] == d)
@@ -330,21 +325,18 @@ public class University {
     public static int computerMove(char[][] board, char me, char opp, Random rng) {
         int cols = board[0].length;
 
-        // 1) Win move: Can I win by dropping my disc?
         for (int c = 0; c < cols; c++) {
             if (!isColumnFull(board, c) && leadsToWin(board, c, me)) {
                 return c;
             }
         }
 
-        // 2) Block move: Can the opponent win if they play in a column?
         for (int c = 0; c < cols; c++) {
             if (!isColumnFull(board, c) && leadsToWin(board, c, opp)) {
                 return c;
             }
         }
 
-        // 3) Prefer center column (0-based)
         int center = cols / 2;
         for (int d = 0; d < cols; d++) {
             int left = center - d;
@@ -356,13 +348,12 @@ public class University {
                 return right;
         }
 
-        // 4) Random valid column (using an array)
         int[] validCols = new int[cols];
         int count = 0;
 
         for (int c = 0; c < cols; c++) {
             if (!isColumnFull(board, c)) {
-                validCols[count] = c; // store in array
+                validCols[count] = c;
                 count++;
             }
         }
@@ -372,7 +363,6 @@ public class University {
             return validCols[randomIndex];
         }
 
-        // No valid columns left (board is full)
         return 0;
     }
 
@@ -469,7 +459,6 @@ public class University {
             System.out.print(prompt);
             String input = SC.nextLine().trim();
 
-            // Check if numeric
             boolean numeric = true;
             for (int i = 0; i < input.length(); i++) {
                 char ch = input.charAt(i);
@@ -481,16 +470,14 @@ public class University {
 
             if (!numeric || input.isEmpty()) {
                 System.out.println("Incorrect entry. Please enter a number.");
-                continue; // ask again
+                continue;
             }
 
-            // Convert string to number (manually)
             int value = 0;
             for (int i = 0; i < input.length(); i++) {
                 value = value * 10 + (input.charAt(i) - '0');
             }
 
-            // Check range
             if (value < min || value > max) {
                 System.out.println("Number " + min + " with " + max + " should be between.");
                 continue;
