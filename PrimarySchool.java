@@ -196,16 +196,16 @@ public class PrimarySchool{
 
     }
 
-    private static String reverseWords(String Text){
+     private static String reverseWords(String Text){
         String[] words = Text.split(" ");
 
         // ters sırayla yeni bir stringbuilder oluşturuyoruz.
         StringBuilder reversed = new StringBuilder();
 
         // kelimeleri sondan başa doğru ekler
-        for (int i = words.length - 1; i >= 0; i--){
-            reversed.append(words[i]);
-            if (i != 0){// son kelimeden sonra boşluk eklemek istemiyoruz.
+        for (int i = 0; i < words.length; i++){
+            reversed.append(new StringBuilder(words[i]).reverse());
+            if (i < words.length -1){// son kelimeden sonra boşluk eklemek istemiyoruz.
                 reversed.append(" ");
             }
         }
