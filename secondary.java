@@ -1,4 +1,3 @@
-import java.lang.classfile.CodeBuilder.CatchBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -9,7 +8,17 @@ public class secondary {
 
     static String userInput = "";
 
+    /**
+     * Main entry point for the application.
+     * Displays the main menu, handles user navigation, and routes to Operation 1 or 2.
+     * @param args Command line arguments (not used).
+     */
     public static void main(String[] args) {
+        secondaryMenu();
+        
+    }
+
+    public static void secondaryMenu(){
         clearConsole();
         System.out.println("Hello this is the option B");
         System.out.println("Type 'exit' to leave");
@@ -42,29 +51,7 @@ public class secondary {
                         atkin(n);
                         break;
                     case "2", "Operation 2", "Evoluation of Expression":
-                        clearConsole();
-                        System.out.println("You have selected Step-by-step Evaluation of Expression");
-                        System.out.println("Enter an expression using digits and + - x : ( ). Type 'back' to return.");
-                        System.out.println("-------------------------------");
-                        while (true) {
-                            System.out.print("expr> ");
-                            String expr = input.nextLine();
-                            if (expr == null) continue;
-                            expr = expr.trim();
-                            if (expr.equalsIgnoreCase("back")) {
-                                System.out.println("-------------------------------");
-                                break;
-                            }
-                            if (!isValid(expr)) {
-                                System.out.println("re-enter a valid expression.");
-                                continue;
-                            }
-                            try {
-                                stepEvaluate(expr); // prints steps itself
-                            } catch (Exception e) {
-                                System.out.println("re-enter a valid expression.");
-                            }
-                        }
+                        operation2_evaluateExpression(); 
                         break;
                     case "exit":
                         clearConsole();
@@ -79,10 +66,12 @@ public class secondary {
                 System.out.println("An error occurred: " + e.getMessage());
             }
         }
-
-        
     }
 
+    /**
+     * Clears the terminal screen.
+     * Uses 'cls' for Windows and 'clear' for Unix-based systems.
+     */
     public static void clearConsole() {
         try {
             if (System.getProperty("os.name").contains("Windows")) {
@@ -95,6 +84,13 @@ public class secondary {
         }
     }
 
+
+    //-----------------------OPERATION-1-----------------------
+
+    /**
+     * Operation 1.1: Finds all primes up to n using the Sieve of Eratosthenes.
+     * @param n The upper bound (inclusive) to find primes up to.
+     */
     public static void eratosthenes(int n) {
         boolean[] prime = new boolean[n+1];
         int primesInRange = 0;
@@ -159,6 +155,10 @@ public class secondary {
 
     }
 
+    /**
+     * Operation 1.2: Finds all primes up to n using the Sieve of Sundaram.
+     * @param n The upper bound (inclusive) to find primes up to.
+     */
     public static void sundaram(int n) {
         int nHalf = n/2;
         boolean[] marked = new boolean[nHalf + 1];
@@ -208,6 +208,10 @@ public class secondary {
 
     }
 
+    /**
+     * Operation 1.3: Finds all primes up to n using the Sieve of Atkin.
+     * @param n The upper bound (inclusive) to find primes up to.
+     */
     public static void atkin(int n) {
         boolean[] marked = new boolean[n + 1];
         marked[2] = true;
@@ -295,228 +299,398 @@ public class secondary {
             }
         }
     
-
-
         System.out.println();
         Long totalTime = endTime - startTime;
         System.out.println("Time taken to compute primes up to " + n + ": " + totalTime + " nanoseconds");
         System.out.println("-------------------------------");
     }
     
-    private static String lastPrinted = null;
-    // ---------------- Option 2: EXPRESSION EVALUATOR ----------------
-    // Entry point: prints every step (lines starting with "= ")
-    private static void stepEvaluate(String raw) {
-        String expr = normalizeForEval(raw);
 
-        // 1) Parantezleri içten dışa indir ve adım yaz
-        while (expr.contains("(")) {
-            int r = expr.indexOf(')');
-            if (r < 0) throw new RuntimeException("unbalanced");
-            int l = expr.lastIndexOf('(', r);
-            if (l < 0) throw new RuntimeException("unbalanced");
+    //-----------------------OPERATION-2 (FIXED)-----------------------
 
-            String inner = expr.substring(l + 1, r);
-            String reduced = reduceAll(inner);
-            expr = tidy(expr.substring(0, l) + reduced + expr.substring(r + 1));
-            printStep(expr); // veya System.out.println("= " + clean(pretty(expr)));
-        }
+    /**
+     * Main function for Operation 2.
+     * Handles the user input loop, validation, and calls the step-by-step evaluator.
+     * Catches any evaluation errors (like Division by Zero) and asks for re-entry.
+     */
+    private static void operation2_evaluateExpression() {
+        Scanner input = new Scanner(System.in);
+        clearConsole();
+        System.out.println("You have selected Step-by-step Evaluation of Expression");
+        System.out.println("Enter an expression using digits and + - x : ( ). Type 'back' to return.");
+        System.out.println("-------------------------------");
+        
+        while (true) {
+            System.out.print("expr> ");
+            String expr = input.nextLine();
+            if (expr == null) continue;
+            expr = expr.trim();
+            if (expr.equalsIgnoreCase("back")) {
+                System.out.println("-------------------------------");
+                break;
+            }
 
-        // 🔧 DÜZELTME B: parantezler bitince 0-<num> → -<num>
-        expr = compressLeadingZeroMinus(expr);
+            if (!isValidExpression(expr)) {
+                System.out.println("re-enter a valid expression.");
+                continue;
+            }
 
-        // 2) Çarpma/Bölme adımları
-        expr = reduceWithSteps(expr, "([\\-]?\\d+)\\s*([*/])\\s*([\\-]?\\d+)");
-
-        // 🔧 DÜZELTME B: çarpma/bölmeden sonra oluşabilecek 0-<num> kalıplarını temizle
-        expr = compressLeadingZeroMinus(expr);
-
-        // 3) Toplama/Çıkarma adımları
-        expr = reduceWithSteps(expr, "([\\-]?\\d+)\\s*([+\\-])\\s*([\\-]?\\d+)");
-    }
-
-
-    private static String reduceWithSteps(String expr, String pattern) {
-        Pattern p = Pattern.compile(pattern);
-        Matcher m = p.matcher(expr);
-        while (m.find()) {
-            long a = Long.parseLong(m.group(1));
-            String op = m.group(2);
-            long b = Long.parseLong(m.group(3));
-            long res = switch (op) {
-                case "*" -> a * b;
-                case "/" -> {
-                    if (b == 0) throw new ArithmeticException("div by zero");
-                    yield a / b;
+            try {
+                // Sanitize input: remove spaces and normalize "(+5)" to "(5)"
+                String currentExpr = expr.replaceAll("\\s+", "").replaceAll("\\(\\+", "(");
+                
+                // Loop until the expression is reduced to a single number
+                while (!isNumeric(currentExpr)) {
+                    String nextStep = evaluateOneStep(currentExpr);
+                    currentExpr = nextStep;
+                    System.out.println("= " + prettyPrint(currentExpr));
                 }
-                case "+" -> a + b;
-                case "-" -> a - b;
-                default -> throw new RuntimeException();
-            };
-            expr = expr.substring(0, m.start()) + res + expr.substring(m.end());
-            expr = tidy(expr);
-            printStep(expr);
-            m = p.matcher(expr);
+            } catch (ArithmeticException e) {
+                // Catches Division by zero
+                System.out.println("re-enter a valid expression.");
+            } catch (Exception e) {
+                // Catches other errors, like "no number found"
+                System.out.println("An unexpected error occurred. re-enter a valid expression.");
+            }
         }
-        return expr;
     }
 
-    // Parantez içini tamamen indir (adım yazmadan)
-    private static String reduceAll(String expr) {
-        expr = reduceNoPrint(expr, "([\\-]?\\d+)\\s*([*/])\\s*([\\-]?\\d+)");
-        expr = reduceNoPrint(expr, "([\\-]?\\d+)\\s*([+\\-])\\s*([\\-]?\\d+)");
-        return expr;
-    }
+    /**
+     * Finds and performs just one operation (the next one) based on precedence.
+     * Precedence Order:
+     * 1. Evaluate innermost parenthesis (...)
+     * 2. Unwrap simple parenthesis (number) -> number
+     * 3. Simplify adjacent operators -- -> +, +- -> -, -+ -> -
+     * 4. Multiplication / Division
+     * 5. Addition / Subtraction
+     * @param expr The current expression string.
+     * @return The expression string after performing one step.
+     */
+    private static String evaluateOneStep(String expr) {
+        // Use internal operators '*' and '/'
+        String cleanedExpr = expr.replace('x', '*').replace(':', '/');
 
-    private static String reduceNoPrint(String expr, String pattern) {
-        Pattern p = Pattern.compile(pattern);
-        Matcher m = p.matcher(expr);
-        while (m.find()) {
-            long a = Long.parseLong(m.group(1));
-            String op = m.group(2);
-            long b = Long.parseLong(m.group(3));
-            long res = switch (op) {
-                case "*" -> a * b;
-                case "/" -> {
-                    if (b == 0) throw new ArithmeticException("div by zero");
-                    yield a / b;
+        // 1. Evaluate innermost parenthesis
+        int rParen = cleanedExpr.indexOf(')');
+        if (rParen != -1) {
+            int lParen = cleanedExpr.lastIndexOf('(', rParen);
+            String innerExpr = cleanedExpr.substring(lParen + 1, rParen);
+            String result = reduceFully(innerExpr);
+            String newExpr = cleanedExpr.substring(0, lParen) + result + cleanedExpr.substring(rParen + 1);
+            return tidy(newExpr); // Tidy up combinations like "+-"
+        }
+
+        // 2. Unwrap simple parenthesis, e.g., "(6)" -> 6 or "(-3)" -> -3
+        Matcher m = Pattern.compile("\\((\\-?[0-9]+)\\)").matcher(cleanedExpr);
+        if (m.find()) {
+            return cleanedExpr.substring(0, m.start()) + m.group(1) + cleanedExpr.substring(m.end());
+        }
+
+        // 3. Simplify adjacent operators (one step at a time)
+        if (cleanedExpr.contains("--")) {
+            return cleanedExpr.replaceFirst("--", "+");
+        }
+        if (cleanedExpr.contains("+-")) {
+            return cleanedExpr.replaceFirst("\\+-", "-");
+        }
+        if (cleanedExpr.contains("-+")) {
+            return cleanedExpr.replaceFirst("-\\+", "-");
+        }
+
+        // 4. Multiplication / Division (left to right)
+        for (int i = 0; i < cleanedExpr.length(); i++) {
+            char c = cleanedExpr.charAt(i);
+            if (c == '*' || c == '/') {
+                return performOperation(cleanedExpr, i);
+            }
+        }
+
+        // 5. Addition / Subtraction (left to right)
+        for (int i = 1; i < cleanedExpr.length(); i++) { // Start at 1 to skip leading unary minus
+            char c = cleanedExpr.charAt(i);
+            if (c == '+' || c == '-') {
+                return performOperation(cleanedExpr, i);
+            }
+        }
+        
+        // If no steps are found, it must be a number
+        return cleanedExpr;
+    }
+       
+    /**
+     * Solves an expression (like one inside parentheses) all at once, without steps.
+     * Used to get a single result for a sub-expression.
+     * @param expr The expression to solve (e.g., "5*2-4").
+     * @return The final result as a string (e.g., "6").
+     */
+    private static String reduceFully(String expr) {
+        String current = expr;
+
+        // Loop until the expression stops changing
+        for (int guard = 0; guard < 100; guard++) { // Safety break for infinite loops
+            String before = current;
+
+            // 1. Fully unwrap and simplify operators
+            current = current.replaceAll("\\((\\-?[0-9]+)\\)", "$1");
+            current = current.replaceAll("--", "+");
+            current = current.replaceAll("\\+-", "-");
+            current = current.replaceAll("-\\+", "-");
+
+            // 2. Perform all Mul/Div operations
+            boolean foundMulDiv = false;
+            for (int i = 0; i < current.length(); i++) {
+                char c = current.charAt(i);
+                if (c == '*' || c == '/') {
+                    current = performOperation(current, i);
+                    foundMulDiv = true;
+                    break; // Restart loop to maintain precedence
                 }
-                case "+" -> a + b;
-                case "-" -> a - b;
-                default -> throw new RuntimeException();
-            };
-            expr = expr.substring(0, m.start()) + res + expr.substring(m.end());
-            m = p.matcher(expr);
+            }
+            if (foundMulDiv) continue;
+
+            // 3. Perform all Add/Sub operations
+            boolean foundAddSub = false;
+            for (int i = 1; i < current.length(); i++) {
+                char c = current.charAt(i);
+                if (c == '+' || c == '-') {
+                    current = performOperation(current, i);
+                    foundAddSub = true;
+                    break; // Restart loop
+                }
+            }
+            if (foundAddSub) continue;
+
+            // If nothing changed, we are done
+            if (before.equals(current)) {
+                break;
+            }
         }
-        return tidy(expr);
+        return current;
     }
 
-    // -------- Validation & helpers --------
-    private static boolean isValid(String s) {
+    /**
+     * Performs a single calculation (e.g., '5*2') at a specific index.
+     * Finds the left/right numbers, calculates the result, and rebuilds the string.
+     * @param expr The full expression string.
+     * @param opIndex The index of the operator (e.g., '*').
+     * @return The new expression string with the operation completed.
+     */
+    private static String performOperation(String expr, int opIndex) {
+        char op = expr.charAt(opIndex);
+
+        // Find the number to the left
+        String leftNum = findLeftNumber(expr, opIndex - 1);
+        
+        // Find the number to the right and how many characters it used
+        String rightNumAndLength = findRightNumber(expr, opIndex + 1);
+        String[] parts = rightNumAndLength.split(";");
+        String rightNum = parts[0];
+        int rightNumConsumedLength = Integer.parseInt(parts[1]);
+
+        // Calculate start/end index of the "left_num op right_num" part
+        int lIndex = opIndex - leftNum.length();
+        int rIndex = opIndex + 1 + rightNumConsumedLength;
+
+        // Get the result
+        String result = calculate(leftNum, op, rightNum);
+
+        // Rebuild the string
+        String newExpr = expr.substring(0, lIndex) + result + expr.substring(rIndex);
+        return newExpr;
+    }
+
+    /**
+     * Helper function. Finds the full number (e.g., '-10' or '25') to the
+     * left of an operator by searching backwards.
+     * @param s The expression string.
+     * @param startIndex The index to start searching from (op_index - 1).
+     * @return The found number as a string.
+     */
+    private static String findLeftNumber(String s, int startIndex) {
+        StringBuilder num = new StringBuilder();
+        for (int i = startIndex; i >= 0; i--) {
+            char c = s.charAt(i);
+            if (Character.isDigit(c)) {
+                num.insert(0, c);
+            } else if (c == '-' && (i == 0 || "+-*/(".indexOf(s.charAt(i - 1)) != -1)) {
+                // This is a unary minus (e.g., "(-5" or "5*-5"), not subtraction
+                num.insert(0, c);
+                break;
+            } else {
+                // End of the number
+                break;
+            }
+        }
+        return num.toString();
+    }
+
+    /**
+     * Helper function. Finds the full number (e.g., '-3' or '+5') to the
+     * right of an operator by searching forwards.
+     * @param s The expression string.
+     * @param startIndex The index to start searching from (op_index + 1).
+     * @return A string "number;length" (e.g., "-3;2") indicating the number
+     * and how many characters it consumed.
+     */
+    private static String findRightNumber(String s, int startIndex) {
+        StringBuilder num = new StringBuilder();
+        int consumedLength = 0;
+        
+        if (startIndex >= s.length()) {
+             // This happens for invalid input like "5+"
+             throw new StringIndexOutOfBoundsException("Expression ended unexpectedly");
+        }
+        
+        char firstChar = s.charAt(startIndex);
+
+        // Handle unary + or - (e.g., "5x-3" or "5x+3")
+        if (firstChar == '-' || firstChar == '+') {
+            num.append(firstChar);
+            startIndex++;
+            consumedLength++;
+        }
+
+        // Read all following digits
+        for (int i = startIndex; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isDigit(c)) {
+                num.append(c);
+                consumedLength++;
+            } else {
+                break;
+            }
+        }
+        
+        // Error case: "5x+" or "5x-" with no number after
+        if (num.length() == 0 || (num.length() == 1 && (num.charAt(0) == '+' || num.charAt(0) == '-'))) {
+             throw new NumberFormatException("No number found after operator");
+        }
+        
+        // Return both the number and its total length
+        return num.toString() + ";" + consumedLength;
+    }
+
+    /**
+     * Performs the actual math on two numbers (as strings).
+     * Handles basic arithmetic and throws an error for division by zero.
+     * @param num1 Left number (e.g., "5").
+     * @param op Operator (e.g., '*').
+     * @param num2 Right number (e.g., "-3").
+     * @return The result as a string (e.g., "-15").
+     */
+    private static String calculate(String num1, char op, String num2) {
+        long a = Long.parseLong(num1);
+        long b = Long.parseLong(num2);
+
+        switch (op) {
+            case '*':
+                return String.valueOf(a * b);
+            case '/':
+                if (b == 0) {
+                    throw new ArithmeticException("Division by zero");
+                }
+                return String.valueOf(a / b);
+            case '+':
+                return String.valueOf(a + b);
+            case '-':
+                return String.valueOf(a - b);
+            default:
+                throw new IllegalArgumentException("Unknown operator: " + op);
+        }
+    }
+
+    /**
+     * Checks if the user's raw input is valid based on project rules.
+     * This is the main safeguard against invalid expressions.
+     * @param s The raw expression string from the user.
+     * @return true if the expression is valid, false otherwise.
+     */
+    public static boolean isValidExpression(String s) {
         if (s == null || s.isEmpty()) return false;
         String noSpaces = s.replaceAll("\\s+", "");
-        if (!noSpaces.matches("[0-9()+\\-x:]+")) return false;
+        if (noSpaces.isEmpty()) return false;
 
-        // parantez dengesi
-        int bal = 0;
+        // 1. Check for invalid characters
+        if (!noSpaces.matches("^[0-9()+\\-x:]+$")) return false;
+
+        // 2. Check for unbalanced parentheses
+        int balance = 0;
         for (char c : noSpaces.toCharArray()) {
-            if (c == '(') bal++;
-            else if (c == ')') { bal--; if (bal < 0) return false; }
+            if (c == '(') balance++;
+            else if (c == ')') {
+                balance--;
+                if (balance < 0) return false; // Closing parenthesis came first
+            }
         }
-        if (bal != 0) return false;
+        if (balance != 0) return false; // Unbalanced
 
-        // *** kritik değişiklik: tidy'siz normalizasyon ***
-        String t = normalizeForValidation(s);
+        // 3. Check for implicit multiplication (e.g., "2(3)" or "(3)4")
+        if (noSpaces.matches(".*[0-9]\\(.*") || noSpaces.matches(".*\\)[0-9].*") || noSpaces.contains(")(")) return false;
+        
+        // 4. Check for operators at the start or end
+        if (noSpaces.matches("^[+x:].*") || noSpaces.matches(".*[+\\-x:]$")) return false;
+        
+        // 5. Check for operators right before a closing parenthesis
+        if (noSpaces.matches(".*[+\\-x:]\\).*")) return false;
+        
+        // 6. Check for empty parentheses
+        if (noSpaces.contains("()")) return false;
 
-        // baş/son operatör kontrolü
-        if (t.matches("^[+*/].*") || t.matches(".*[+\\-*/]$")) return false;
-
-        // gizli çarpım yasak: ")(" veya "digit("
-        if (t.contains(")(")) return false;
-        for (int i = 0; i < t.length() - 1; i++) {
-            char c1 = t.charAt(i), c2 = t.charAt(i + 1);
-            if (Character.isDigit(c1) && c2 == '(') return false;
-            if (c1 == ')' && Character.isDigit(c2)) return false;
+        // 7. Check for static division by zero
+        if (noSpaces.contains(":0")) {
+            if (noSpaces.matches(".*:0($|[^0-9]).*")) return false; // Matches ":0", ":0)", ":0+" but not ":05"
         }
 
-        // ARDIŞIK OPERATÖRLER: ++ kesinlikle yasak (örnek gereği)
-        // Diğerleri de yakalanıyor; istersen '--'u serbest bırakabiliriz (aşağıdaki satırdaki -- kısmını silerek).
-        if (t.matches(".*(\\+\\+|\\+\\*|\\+/|\\*\\+|/\\+|[+*/]{2,}|--{2,}).*")) return false;
+        // 8. Manual checks for invalid operator sequences
+        if (noSpaces.contains("---")) return false;
+        if (noSpaces.contains("+++")) return false;
+        if (noSpaces.matches(".*[x:]{2,}.*")) return false; // e.g., "::", "xx", "x:", ":x"
+        if (noSpaces.matches(".*[+\\-][x:].*")) return false; // e.g., "+x", "+:", "-x", "-:"
+        if (noSpaces.contains("++")) return false; // e.g., "4++7"
+        if (noSpaces.matches(".*[x:][+].*")) return false; // e.g., "x+", ":+"
 
+        // Note: "--", "+-", "-+", "x-", "x+", ":-", ":+" are considered VALID
+        // as they are handled by the evaluator (unary operators).
+        
         return true;
     }
 
-
-        // --- NEW: validation-time normalize (NO tidy) ---
-    private static String normalizeForValidation(String s) {
-        String t = s.replace('x', '*').replace(':', '/');
-        t = t.replaceAll("\\s+", "");
-        StringBuilder out = new StringBuilder();
-        for (int i = 0; i < t.length(); i++) {
-            char c = t.charAt(i);
-            if (c == '-' && (i == 0 || t.charAt(i - 1) == '(')) {
-                out.append("(0-");      // parantez aç
-                // sayının geri kalanını da kapat
-                int j = i + 1;
-                while (j < t.length() && Character.isDigit(t.charAt(j))) {
-                    out.append(t.charAt(j));
-                    j++;
-                }
-                out.append(')');        // parantez kapat
-                i = j - 1;              // döngüyü o kadar ilerlet
-            } else {
-                out.append(c);
-            }
-
-        }
-        return out.toString(); // <- tidy YOK!
-    }
-
-    // mevcut normalize'ı sadece EVAL için kullanacağız
-    private static String normalizeForEval(String s) {
-        String t = s.replace('x', '*').replace(':', '/');
-        t = t.replaceAll("\\s+", "");
-        StringBuilder out = new StringBuilder();
-        for (int i = 0; i < t.length(); i++) {
-            char c = t.charAt(i);
-            if (c == '-' && (i == 0 || t.charAt(i - 1) == '(')) {
-                out.append("(0-");      // parantez aç
-                // sayının geri kalanını da kapat
-                int j = i + 1;
-                while (j < t.length() && Character.isDigit(t.charAt(j))) {
-                    out.append(t.charAt(j));
-                    j++;
-                }
-                out.append(')');        // parantez kapat
-                i = j - 1;              // döngüyü o kadar ilerlet
-            } else {
-                out.append(c);
-            }
-
-        }
-        return tidy(out.toString()); // <- tidy VAR
-    }
-
-
-    // +/− işaretlerini sadeleştir
+    /**
+     * A simple cleanup utility. Simplifies '+-' to '-' and '-+' to '-'
+     * after an operation rebuilds the string.
+     * @param s The string to clean.
+     * @return The cleaned string.
+     */
     private static String tidy(String s) {
         String t = s;
-        // birkaç kez geçerek basitleştir
-        for (int i = 0; i < 3; i++) {
+        // Run twice to catch overlaps
+        for (int i = 0; i < 2; i++) {
             t = t.replaceAll("\\+\\-", "-")
-                 .replaceAll("\\-\\+", "-")
-                 .replaceAll("\\+\\+", "+")
-                 .replaceAll("--", "+");
+                 .replaceAll("\\-\\+", "-");
         }
         return t;
     }
 
-    // Ekrana x ve : ile yazdırma
-    private static String pretty(String s) {
+    /**
+     * Checks if a string is a single number (positive or negative).
+     * Used to know when the evaluation is finished.
+     * @param s The string to check.
+     * @return true if the string is only a number, false otherwise.
+     */
+    private static boolean isNumeric(String s) {
+        if (s == null || s.isEmpty()) {
+            return false;
+        }
+        return s.matches("^-?[0-9]+$");
+    }
+
+    /**
+     * Converts the internal format ('*', '/') back to the
+     * user-facing format ('x', ':') for printing.
+     * @param s The internal expression string.
+     * @return The "pretty" string for the user to see.
+     */
+    private static String prettyPrint(String s) {
         return s.replace('*', 'x').replace('/', ':');
     }
-
-    private static String clean(String s) {
-    // Başta veya "(0-" şeklinde görünen 0'ları kaldırır
-    return s.replaceAll("\\(0-", "(-").replaceAll("(^|[^0-9])0-", "$1-");
-    }
-
-    // yeni yazdırma metodu
-    private static void printStep(String expr) {
-        String out = "= " + clean(pretty(expr));
-        if (!out.equals(lastPrinted)) {
-            System.out.println(out);
-            lastPrinted = out;
-        }
-    }
-
-    // 0-<num> → -<num> dönüştürme (satır başında veya '(' sonrası)
-    private static String compressLeadingZeroMinus(String s) {
-        s = s.replaceAll("^0-(\\d+)", "-$1");      // satır başı: 0-10 -> -10
-        s = s.replaceAll("\\(0-(\\d+)", "(-$1");   // parantez sonrası: (0-2 -> (-2
-        return s;
-    }
-
-
 }
-
