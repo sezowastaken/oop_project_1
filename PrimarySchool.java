@@ -1,6 +1,14 @@
 import java.util.Scanner;
 
 
+/**
+ * The PrimarySchool class provides two basic functions:
+ * 1. Calculate the user's age and zodiac sign
+ * 2. Reverse words in a sentence
+ * 
+ * The program works with a simple menu and keeps running 
+ * until the user chooses to return to the main menu.
+ */
 public class PrimarySchool{
 
     private static final Scanner SC = new Scanner(System.in);
@@ -10,15 +18,18 @@ public class PrimarySchool{
         runPrimarySchool();
     }
 
-    /** PrimarySchool menüsünü calıstırdık
-     * Kullanıcı ana menüye dönenen kadar bu PrimarySchool menüsü calısacak
-     */
-
      private static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
     
+    /**
+     * Runs the Primary School main menu.
+     * The user can choose from three options:
+     * 1) Age and Zodiac Sign Detection
+     * 2) Reverse the Words
+     * 3) Back to Main Menu
+     */
     public static void runPrimarySchool(){
         clearScreen();
        
@@ -52,14 +63,18 @@ public class PrimarySchool{
         }
     }
 
+     /**
+     * Gets user's birth date and today's date, then calculates
+     * the age and zodiac sign. Does not allow ages over 100 years.
+     */
     private static void AgeAndZodiacDetection(){
 
         clearScreen();
         System.out.println("\n---- Age and Zodiac Sign Detection ----");
         
-        int day = askInt("Day of birth (1-31): ");
-        int month = askInt("Month of birth (1-12): ");
-        int year = askInt("Year of birth (exp: 1990): ");
+        int day = askInt("Day of birth (1-31): ",1, 31);
+        int month = askInt("Month of birth (1-12): ",1, 12);
+        int year = askInt("Year of birth (exp: 1990): ",1900, 2025);
 
         if(!isValidDate(year, month, day)){
             System.out.println("Invalid date! Please try again. ");
@@ -67,29 +82,55 @@ public class PrimarySchool{
         }
 
         System.out.println("Please Enter a today's date:");
-        int currentDay = askInt("Current day (1-31): ");
-        int currentMonth = askInt("Current month (1-12): ");
-        int currentYear = askInt("Current year (e.g. 2025): ");
-        
+        int currentDay = askInt("Current day (1-31): ", 1, 31);
+        int currentMonth = askInt("Current month (1-12): ", 1, 12);
+        int currentYear = askInt("Current year (e.g. 2025): ", 1900, 2025);
 
+        if (currentYear - year > 100) {
+            System.out.println("Age cannot be greater than 100! Please try again.");
+            return;
+        }
+        
         calculateAge(day, month, year, currentDay, currentMonth, currentYear);
-        // hesaplamayı yapan metoda yönlendirme işlemi , bu metot sonucunda ekrana yazacağız
+        
         repeatOrReturn(PrimarySchool::AgeAndZodiacDetection);
     }
 
-    private static int askInt(String message){
-        while (true){
+     /**
+     * Asks the user to enter an integer and checks if it is valid.
+     *
+     * @param message The message shown to the user
+     * @param min The minimum valid value
+     * @param max The maximum valid value
+     * @return The integer entered by the user
+     */
+    private static int askInt(String message, int min, int max) {
+        while (true) {
             try {
                 System.out.print(message);
-                return Integer.parseInt(SC.nextLine().trim());
+                int value = Integer.parseInt(SC.nextLine().trim());
+                if (value < min || value > max) {
+                    System.out.printf("Invalid range! Please enter a value between %d and %d.%n", min, max);
+                    continue;
+                }
+                return value;
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input! Please enter a valid number.");
             }
         }
     }
-    // ayın 1-12 arasında olup olmadığını ve günün 1-31 arasında olup olmadığını kontrol eder.
+
+       /**
+     * Checks if the given year, month, and day form a valid date.
+     *
+     * @param year Year
+     * @param month Month
+     * @param day Day
+     * @return True if the date is valid, false otherwise
+     */
+    
     private static boolean isValidDate(int year, int month, int day){
-        if (month < 1 || month > 12 || day < 1 || day >31)
+        if (month < 1 || month > 12 || day < 1 || day >31)  // Checks if the month is between 1-12 and the day is between 1-31.
         return false;
 
         int daysInMonth = calculateDaysInMonth(month, year);
@@ -97,10 +138,14 @@ public class PrimarySchool{
         // şubat 29-28 farkını calculateDaysInMonth kullanarak hesaplarız.
     }
 
-    /* 1) Eğer doğum günü bugünkü günden büyükse, önceki aydan ödünç gün alırız önceki aydan 1 azaltırız.
-     * 2) Eğer doğum ayı bugünkü aydan büyükse, önceki yıldan ödünç ay alırnır , yıl 1 azaltılır ay 12 artar
-    */
-
+    /* 1) If the birthdate is greater than today's day, we borrow days from the previous month and decrease the previous month by 1.
+    2) If the birthdate is greater than today's month, we borrow months from the previous year, decrease the year by 1 and increase the month by 12.
+    */ 
+    
+     /**
+     * Calculates the user's age and zodiac sign based on birth date 
+     * and today's date. Displays the results in years, months, and days.
+     */
     private static void calculateAge(int birthDay, int birthMonth, int birthYear, int currentDay, int currentMonth, int currentYear) {
 
         if (birthYear > currentYear ||
@@ -114,22 +159,19 @@ public class PrimarySchool{
         int month = currentMonth;
         int year = currentYear;
 
-            // Bugün 15 ise doğum günü 25 ise bugünden doğum günü çıkmaz bir önceki aydan bir azaltırız ve o ayı gün olarak ekleriz
         if (birthDay > day) {
             month -= 1;
 
             if (month == 0){
                 month = 12;
                 year -=1;
-                 // eğer ay 0 ise 12.aya gideriz ve yılı bir azaltırız
             }
-            day += calculateDaysInMonth(month, year);  // önceki ayın gün sayısınını ekleriz 
+            day += calculateDaysInMonth(month, year);  
         }
 
         if (birthMonth > month){
-            month +=12;  // ay değerine 12 ay ekleriz
-            year -=1;    // yıldan 1 yıl azaltırız
-            // Doğum ayı bugünden büyükse ödünç ay alırız 
+            month +=12;  
+            year -=1;    
         }
 
         int years = year - birthYear;
@@ -145,6 +187,14 @@ public class PrimarySchool{
         
     }
 
+     /**
+     * Calculates how many days are in a given month and year.
+     * Accounts for leap years.
+     *
+     * @param month Month (1-12)
+     * @param year Year
+     * @return Number of days in the month
+     */
     private static int calculateDaysInMonth(int month, int year){
 
         switch (month){
@@ -156,11 +206,10 @@ public class PrimarySchool{
                 return 30;
 
             case 2:
-            /* 4 yılda bir şubat 29 çekmektedir. Eğer yıl 400 ile tam bölünüyorsa artık yıl olmaktadır. 
-             * Eğer yıl 100 ile tam bölünüyor fakat 400 e bölünmüyorsa artık yıl değildir.
-             * Eğer yıl 4 ile tam bölünüyor fakat 100 e bölünmüyorsa artık yıldır.
+            /* February occurs on the 29th day every 4 years. If the year is divisible by 400, it is a leap year.
+            * If the year is divisible by 100 but not by 400, it is not a leap year.
+            * If the year is divisible by 4 but not by 100, it is a leap year.
             */
-
             if ((year % 400 == 0) || (year %4 == 0 && year % 100 != 0)){
                 return 29;
             }
@@ -171,6 +220,13 @@ public class PrimarySchool{
             return 0;
         } 
     }
+     /**
+     * Determines the zodiac sign based on day and month.
+     *
+     * @param day Day
+     * @param month Month
+     * @return Zodiac sign as a string
+     */
 
     private static String calculateZodiacSign(int day, int month){
 
@@ -196,7 +252,6 @@ public class PrimarySchool{
         System.out.println("Please Enter a Sentence:");
         String sentence = SC.nextLine();
 
-        // boş null sentence kontrolü
         if (sentence == null || sentence.trim().isEmpty()){
             System.out.println("You entered an empty sentence. Returning to menu");
             return;
@@ -208,10 +263,17 @@ public class PrimarySchool{
         System.out.printf("Normal Version: %s%n", NormalVersion);
         System.out.printf("Reversed Version: %s%n", ReversedVersion);
 
-        repeatOrReturn(PrimarySchool::AgeAndZodiacDetection);
+        repeatOrReturn(PrimarySchool::ReverseTheWords);
 
     }
 
+       /**
+     * Reverses words in a string. Words with 2 or more letters are reversed,
+     * single letters remain the same.
+     *
+     * @param text Input text
+     * @return Text with words reversed
+     */
     private static String reverseWordsSymbols(String text){
         if(text == null || text.isEmpty())
             return text;
@@ -227,16 +289,14 @@ public class PrimarySchool{
                 j++;
                 String word = text.substring(i, j);
 
-                // sadece 2 ve fazla harf içeren kelimeleri  ters çevirme
                 if (word.length() >= 2){
                     out.append(reverseRecursive(word));
                 }
                 else{
-                    out.append(word);  // tek harfli ise olduğu gibi bırakırız
+                    out.append(word);  
                 }
                 i = j;
             }
-            //noktalama işareti, boşluk , rakam olduğu yerde kalsın değişmesin
             else{
                 out.append(character);
                 i++;
@@ -245,6 +305,12 @@ public class PrimarySchool{
         return out.toString();
     }
 
+     /**
+     * Recursively reverses a single word.
+     *
+     * @param s Word
+     * @return Reversed word
+     */
     private static String reverseRecursive(String s){
         if( s == null)
             return null;
@@ -253,15 +319,27 @@ public class PrimarySchool{
         return reverseRecursive(s.substring(1)) + s.charAt(0);
     }
 
+     /**
+     * Normalizes spaces in a string.
+     * Trims leading and trailing spaces and replaces multiple spaces with a single space.
+     *
+     * @param Text Input text
+     * @return Normalized text
+     */
     private static String normalizeSpaces(String Text){
 
         return Text.trim().replaceAll("\\s+", " ");
-        // Başta ve sonda olan boşlukları kaldırır, birden fazla boşluk varsa tek boşluğa indirir.
+       // Removes leading and trailing spaces, reduces multiple spaces to a single space.
     }
 
+     /**
+     * Gives the user the option to repeat an operation or return to the main menu.
+     *
+     * @param action The operation to repeat if the user chooses to repeat
+     */
     private static void repeatOrReturn(Runnable action) {
         while (true) {
-            System.out.println("\nWhat do you want to do:");
+            System.out.println("\nWhat do you want to:");
             System.out.println("[1] Repeat the same operation");
             System.out.println("[2] Return to Primary School Menu");
             System.out.print("Your choice: ");
@@ -270,9 +348,9 @@ public class PrimarySchool{
             switch (again) {
                 case "1":
                     action.run();
-                    return; // repeat ettikten sonra çıkma
+                    return; 
                 case "2":
-                    return; // ana menüye dönme
+                    return; 
                 default:
                     System.out.println("Invalid choice. Please select 1 or 2.");
             }
