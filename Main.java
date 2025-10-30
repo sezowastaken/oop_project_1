@@ -24,9 +24,8 @@ public class Main {
             System.out.println("[E] Terminate");
             System.out.print("Choose: ");
 
-            String input = sc.nextLine().trim().toUpperCase(); // static sc kullanılıyor
+            String input = sc.nextLine().trim().toUpperCase();
             clearScreen();
-            // kontrol: sadece 1 harf olmalı ve A-E arası olmalı
 
             if (input.length() == 1 && input.matches("[A-E]")) {
                 char choice = input.charAt(0); // tek karakter al
@@ -80,29 +79,34 @@ public class Main {
     static String userInput = "";
 
     public static void secondaryMenu() {
+        userInput = "";
         clearConsole();
         System.out.println("Hello this is the option B");
         System.out.println("Type 'exit' to leave");
         System.out.println("-------------------------------");
-        while (!userInput.equals("exit")) {
+        while (true) {
             try {
                 System.out.println("Operation 1) Prime Numbers");
                 System.out.println("Operation 2) Evoluation of Expression");
                 System.out.print("Enter an operation: ");
 
-                Scanner input = new Scanner(System.in);
+                
 
-                userInput = input.nextLine();
+                userInput = sc.nextLine();
 
                 switch (userInput) {
                     case "1", "Operation 1", "Prime Numbers":
                         int n;
-                        Scanner scanner = new Scanner(System.in);
+
                         clearConsole();
                         System.out.println("You have selected Prime Numbers");
+                        System.out.println("Type 'exit' to leave");
                         System.out.println("-------------------------------");
                         System.out.print("Enter a positive integer to find all prime numbers up to that number:");
-                        n = scanner.nextInt();
+
+                        n = sc.nextInt();
+                        sc.nextLine();
+
                         System.out.println("Sieve of Eratosthenes Algorithm");
                         eratosthenes(n);
                         System.out.println("Sieve of Sundaram Algorithm");
@@ -116,14 +120,18 @@ public class Main {
                     case "exit":
                         clearConsole();
                         System.out.println("Exiting...");
-                        input.close();
-                        break;
+                        return;
                     default:
                         System.out.println("Invalid option, please try again.");
                 }
 
             } catch (Exception e) {
-                System.out.println("An error occurred: " + e.getMessage());
+                if (e instanceof java.util.InputMismatchException) {
+                    System.out.println("Invalid input, please enter a number.");
+                    sc.nextLine();
+                } else {
+                    System.out.println("An error occurred: " + e.getMessage());
+                }
             }
         }
     }
@@ -367,9 +375,7 @@ public class Main {
 
     /**
      * Main function for Operation 2.
-     * Handles the user input loop, validation, and calls the step-by-step
-     * evaluator.
-     * Catches any evaluation errors (like Division by Zero) and asks for re-entry.
+     * Handles the user input loop, validation, and starts the recursive evaluation.
      */
     private static void operation2_evaluateExpression() {
         Scanner input = new Scanner(System.in);
@@ -377,15 +383,14 @@ public class Main {
         System.out.println("You have selected Step-by-step Evaluation of Expression");
         System.out.println("Enter an expression using digits and + - x : ( ). Type 'back' to return.");
         System.out.println("-------------------------------");
-
+        
         while (true) {
             System.out.print("expr> ");
             String expr = input.nextLine();
-            if (expr == null)
-                continue;
+            if (expr == null) continue;
             expr = expr.trim();
             if (expr.equalsIgnoreCase("back")) {
-                System.out.println("-------------------------------");
+                clearConsole();
                 break;
             }
 
@@ -395,23 +400,36 @@ public class Main {
             }
 
             try {
-                // Sanitize input: remove spaces and normalize "(+5)" to "(5)"
                 String currentExpr = expr.replaceAll("\\s+", "").replaceAll("\\(\\+", "(");
+                
+                solveRecursively(currentExpr);
 
-                // Loop until the expression is reduced to a single number
-                while (!isNumeric(currentExpr)) {
-                    String nextStep = evaluateOneStep(currentExpr);
-                    currentExpr = nextStep;
-                    System.out.println("= " + prettyPrint(currentExpr));
-                }
             } catch (ArithmeticException e) {
-                // Catches Division by zero
                 System.out.println("re-enter a valid expression.");
             } catch (Exception e) {
-                // Catches other errors, like "no number found"
                 System.out.println("An unexpected error occurred. re-enter a valid expression.");
             }
         }
+    }
+
+    /**
+     * This is the RECURSIVE helper function that replaces the while loop.
+     * It evaluates one step, prints it, and then calls itself with the new expression.
+     * @param currentExpr The expression to be evaluated in this step.
+     */
+    private static void solveRecursively(String currentExpr) {
+
+        //stop condition
+        if (isNumeric(currentExpr)) {
+            return;
+        }
+
+
+        String nextStep = evaluateOneStep(currentExpr);
+        
+        System.out.println("= " + prettyPrint(nextStep));
+
+        solveRecursively(nextStep);
     }
 
     /**
@@ -422,7 +440,6 @@ public class Main {
      * 3. Simplify adjacent operators -- -> +, +- -> -, -+ -> -
      * 4. Multiplication / Division
      * 5. Addition / Subtraction
-     * 
      * @param expr The current expression string.
      * @return The expression string after performing one step.
      */
