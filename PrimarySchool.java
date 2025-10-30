@@ -15,10 +15,16 @@ public class PrimarySchool{
      * Kullanıcı ana menüye dönenen kadar bu PrimarySchool menüsü calısacak
      */
 
+     private static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+    
     public static void runPrimarySchool(){
-
+        clearScreen();
+       
         while (true){
-
+            
             System.out.println("\n----- PRIMARY SCHOOL MENU -----");
             System.out.println("[1] Age and Zodiac Sign Detection");
             System.out.println("[2] Reverse the Words");
@@ -44,13 +50,12 @@ public class PrimarySchool{
 
 
             }
-
-
         }
-
     }
 
     private static void AgeAndZodiacDetection(){
+
+        clearScreen();
         System.out.println("\n---- Age and Zodiac Sign Detection ----");
         
         int day = askInt("Day of birth (1-31): ");
@@ -62,10 +67,11 @@ public class PrimarySchool{
             return;
         }
 
-        LocalDate today = LocalDate.now();
-        int currentDay = today.getDayOfMonth();
-        int currentMonth = today.getMonthValue();
-        int currentYear = today.getYear();
+        System.out.println("Please Enter a today's date:");
+        int currentDay = askInt("Current day (1-31): ");
+        int currentMonth = askInt("Current month (1-12): ");
+        int currentYear = askInt("Current year (e.g. 2025): ");
+        
 
         calculateAge(day, month, year, currentDay, currentMonth, currentYear);
         // hesaplamayı yapan metoda yönlendirme işlemi , bu metot sonucunda ekrana yazacağız
@@ -91,19 +97,18 @@ public class PrimarySchool{
         // şubat 29-28 farkını calculateDaysInMonth kullanarak hesaplarız.
     }
 
-    /* 1) Eğer doğum günü bugünkü günden büyükse, gün "ödünç" alınır: önceki aydan
-     *    o ayın gün sayısı eklenir ve ay 1 azaltılır.
-     * 2) Eğer doğum ayı bugünkü aydan büyükse, ay "ödünç" alınır: yılı 1 azaltıp
-     *    aya 12 eklenir. */
+    /* 1) Eğer doğum günü bugünkü günden büyükse, önceki aydan ödünç gün alırız önceki aydan 1 azaltırız.
+     * 2) Eğer doğum ayı bugünkü aydan büyükse, önceki yıldan ödünç ay alırnır , yıl 1 azaltılır ay 12 artar
+    */
 
-    private static void calculateAge(int birthdDay, int birthMonth, int birthYear, int currentDay, int currentMonth, int currentYear) {
+    private static void calculateAge(int birthDay, int birthMonth, int birthYear, int currentDay, int currentMonth, int currentYear) {
 
         int day = currentDay;
         int month = currentMonth;
         int year = currentYear;
 
             // Bugün 15 ise doğum günü 25 ise bugünden doğum günü çıkmaz bir önceki aydan bir azaltırız ve o ayı gün olarak ekleriz
-        if (birthdDay > day) {
+        if (birthDay > day) {
             month -= 1;
 
             if (month == 0){
@@ -111,26 +116,23 @@ public class PrimarySchool{
                 year -=1;
                  // eğer ay 0 ise 12.aya gideriz ve yılı bir azaltırız
             }
-            day += calculateDaysInMonth(month, year);
-            // önceki ayın gün sayısınını ekleriz 
+            day += calculateDaysInMonth(month, year);  // önceki ayın gün sayısınını ekleriz 
         }
 
-        if (birthdDay > month){
+        if (birthMonth > month){
             month +=12;  // ay değerine 12 ay ekleriz
             year -=1;    // yıldan 1 yıl azaltırız
-
             // Doğum ayı bugünden büyükse ödünç ay alırız 
         }
 
         int years = year - birthYear;
-        int months = month - birthMonth;    // kesin hesaplamaları yap
-        int days = day - birthdDay;
+        int months = month - birthMonth;    
+        int days = day - birthDay;
 
         System.out.println("\n--------------------------");
         System.out.printf("Your age is: %d years, %d months, and %d days.%n",years, months, days);
 
-
-        String zodiac = calculateZodiacSign(birthdDay, birthMonth);
+        String zodiac = calculateZodiacSign(birthDay, birthMonth);
         System.out.printf("Your zodiac sign is: %s%n", zodiac);
         System.out.println("---------------------");
         
@@ -160,9 +162,7 @@ public class PrimarySchool{
             }
             default:
             return 0;
-        }
-        
-
+        } 
     }
 
     private static String calculateZodiacSign(int day, int month){
@@ -183,34 +183,65 @@ public class PrimarySchool{
     }
 
     private static void ReverseTheWords(){
+        clearScreen();
 
         System.out.println("\n----- Reverse the words ----");
         System.out.println("Please Enter a Sentence:");
         String sentence = SC.nextLine();
 
+        // boş null sentence kontrolü
+        if (sentence == null || sentence.trim().isEmpty()){
+            System.out.println("You entered an empty sentence. Returning to menu");
+            return;
+        }
+
         String NormalVersion = normalizeSpaces(sentence);
-        String ReversedVersion = reverseWords(NormalVersion);
+        String ReversedVersion = reverseWordsSymbols(NormalVersion);
 
         System.out.printf("Normal Version: %s%n", NormalVersion);
         System.out.printf("Reversed Version: %s%n", ReversedVersion);
 
     }
 
-     private static String reverseWords(String Text){
-        String[] words = Text.split(" ");
+    private static String reverseWordsSymbols(String text){
+        if(text == null || text.isEmpty())
+            return text;
+        StringBuilder out = new StringBuilder();
+        int i = 0;
+        int n = text.length();
 
-        // ters sırayla yeni bir stringbuilder oluşturuyoruz.
-        StringBuilder reversed = new StringBuilder();
+        while (i < n){
+            char character = text.charAt(i);
+            if(Character.isLetter(character)){
+                int j = i;
+                while(j < n && Character.isLetter(text.charAt(j)))
+                j++;
+                String word = text.substring(i, j);
 
-        // kelimeleri sondan başa doğru ekler
-        for (int i = 0; i < words.length; i++){
-            reversed.append(new StringBuilder(words[i]).reverse());
-            if (i < words.length -1){// son kelimeden sonra boşluk eklemek istemiyoruz.
-                reversed.append(" ");
+                // sadece 2 ve fazla harf içeren kelimeleri  ters çevirme
+                if (word.length() >= 2){
+                    out.append(reverseRecursive(word));
+                }
+                else{
+                    out.append(word);  // tek harfli ise olduğu gibi bırakırız
+                }
+                i = j;
+            }
+            //noktalama işareti, boşluk , rakam olduğu yerde kalsın değişmesin
+            else{
+                out.append(character);
+                i++;
             }
         }
-        return reversed.toString(); // StringBuilderi stringe çeviriyoruz.
+        return out.toString();
+    }
 
+    private static String reverseRecursive(String s){
+        if( s == null)
+            return null;
+        if( s.length() <= 1)
+            return s;
+        return reverseRecursive(s.substring(1)) + s.charAt(0);
     }
 
     private static String normalizeSpaces(String Text){
@@ -218,11 +249,4 @@ public class PrimarySchool{
         return Text.trim().replaceAll("\\s+", " ");
         // Başta ve sonda olan boşlukları kaldırır, birden fazla boşluk varsa tek boşluğa indirir.
     }
-
-   
-
-
-
-
-
 }
