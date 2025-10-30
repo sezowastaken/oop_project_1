@@ -1,4 +1,3 @@
-import java.time.LocalDate;
 import java.util.Scanner;
 
 
@@ -75,6 +74,7 @@ public class PrimarySchool{
 
         calculateAge(day, month, year, currentDay, currentMonth, currentYear);
         // hesaplamayı yapan metoda yönlendirme işlemi , bu metot sonucunda ekrana yazacağız
+        repeatOrReturn(PrimarySchool::AgeAndZodiacDetection);
     }
 
     private static int askInt(String message){
@@ -102,6 +102,13 @@ public class PrimarySchool{
     */
 
     private static void calculateAge(int birthDay, int birthMonth, int birthYear, int currentDay, int currentMonth, int currentYear) {
+
+        if (birthYear > currentYear ||
+        (birthYear == currentYear && birthMonth > currentMonth) ||
+        (birthYear == currentYear && birthMonth == currentMonth && birthDay > currentDay)) {
+        System.out.println("You entered a future date. Returning to menu...");
+        return;
+    }
 
         int day = currentDay;
         int month = currentMonth;
@@ -179,7 +186,7 @@ public class PrimarySchool{
         if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) return "Scorpio";
         if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) return "Sagittarius";
         if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) return "Capricorn";
-        return "Unkown";
+        return "Unknown";
     }
 
     private static void ReverseTheWords(){
@@ -200,6 +207,8 @@ public class PrimarySchool{
 
         System.out.printf("Normal Version: %s%n", NormalVersion);
         System.out.printf("Reversed Version: %s%n", ReversedVersion);
+
+        repeatOrReturn(PrimarySchool::AgeAndZodiacDetection);
 
     }
 
@@ -249,4 +258,25 @@ public class PrimarySchool{
         return Text.trim().replaceAll("\\s+", " ");
         // Başta ve sonda olan boşlukları kaldırır, birden fazla boşluk varsa tek boşluğa indirir.
     }
+
+    private static void repeatOrReturn(Runnable action) {
+        while (true) {
+            System.out.println("\nWhat do you want to do:");
+            System.out.println("[1] Repeat the same operation");
+            System.out.println("[2] Return to Primary School Menu");
+            System.out.print("Your choice: ");
+            String again = SC.nextLine().trim();
+    
+            switch (again) {
+                case "1":
+                    action.run();
+                    return; // repeat ettikten sonra çıkma
+                case "2":
+                    return; // ana menüye dönme
+                default:
+                    System.out.println("Invalid choice. Please select 1 or 2.");
+            }
+        }
+    }
+    
 }
