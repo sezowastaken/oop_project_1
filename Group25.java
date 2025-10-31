@@ -2,12 +2,24 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Main {
+/**
+ * The Group 25's first OOP project
+ */
+public class Group25 {
 
-    private static final Scanner sc = new Scanner(System.in);
+    /**
+     * The single (static) Scanner object used for getting all inputs throughout the program.
+     * This prevents the System.in stream from being closed accidentally.
+     */
+    public static final Scanner sc = new Scanner(System.in);
 
+    /**
+     * The main entry point for the program.
+     * Displays the menus and handles navigation
+     * @param args Command line arguments
+     */
     public static void main(String[] args) {
-        Ascii.displayWelcomeMessage();
+        displayWelcomeMessage();
 
         while (true) {
             System.out.println("=== MAIN MENU ===");
@@ -111,6 +123,7 @@ public class Main {
                     return;
                 default:
                     System.out.println("Invalid selection! Please select one of 1-3.");
+                    pause();
 
             }
         }
@@ -120,7 +133,7 @@ public class Main {
      * Gets user's birth date and today's date, then calculates
      * the age and zodiac sign. Does not allow ages over 100 years.
      */
-    private static void AgeAndZodiacDetection() {
+    public static void AgeAndZodiacDetection() {
         clearScreen();
 
         System.out.println("\n---- Age and Zodiac Sign Detection ----");
@@ -146,7 +159,7 @@ public class Main {
 
         calculateAge(day, month, year, currentDay, currentMonth, currentYear);
 
-        repeatOrReturn(Main::AgeAndZodiacDetection, "Primary School");
+        repeatOrReturn(Group25::AgeAndZodiacDetection, "Primary School");
     }
 
     /**
@@ -157,7 +170,7 @@ public class Main {
      * @param max     The maximum valid value
      * @return The integer entered by the user
      */
-    private static int askIntA(String message, int min, int max) {
+    public static int askIntA(String message, int min, int max) {
         while (true) {
             try {
                 System.out.print(message);
@@ -182,7 +195,7 @@ public class Main {
      * @return True if the date is valid, false otherwise
      */
 
-    private static boolean isValidDate(int year, int month, int day) {
+    public static boolean isValidDate(int year, int month, int day) {
         if (month < 1 || month > 12 || day < 1 || day > 31) // Checks if the month is between 1-12 and the day is
                                                             // between 1-31.
             return false;
@@ -202,8 +215,14 @@ public class Main {
     /**
      * Calculates the user's age and zodiac sign based on birth date
      * and today's date. Displays the results in years, months, and days.
+     * @param birthDay   The day of birth
+     * @param birthMonth The month of birth
+     * @param birthYear  The year of birth
+     * @param currentDay The current day
+     * @param currentMonth The current month
+     * @param currentYear  The current year
      */
-    private static void calculateAge(int birthDay, int birthMonth, int birthYear, int currentDay, int currentMonth,
+    public static void calculateAge(int birthDay, int birthMonth, int birthYear, int currentDay, int currentMonth,
             int currentYear) {
 
         if (birthYear > currentYear ||
@@ -253,7 +272,7 @@ public class Main {
      * @param year  Year
      * @return Number of days in the month
      */
-    private static int calculateDaysInMonth(int month, int year) {
+    public static int calculateDaysInMonth(int month, int year) {
 
         switch (month) {
 
@@ -297,7 +316,7 @@ public class Main {
      * @return Zodiac sign as a string
      */
 
-    private static String calculateZodiacSign(int day, int month) {
+    public static String calculateZodiacSign(int day, int month) {
 
         if ((month == 1 && day >= 20) || (month == 2 && day <= 18))
             return "Aquarius";
@@ -326,7 +345,10 @@ public class Main {
         return "Unknown";
     }
 
-    private static void ReverseTheWords() {
+    /**
+     * Handles the "Reverse the Words" operation for the Primary School menu.
+     */
+    public static void ReverseTheWords() {
         clearScreen();
 
         System.out.println("\n----- Reverse the words ----");
@@ -344,7 +366,7 @@ public class Main {
         System.out.printf("Normal Version: %s%n", NormalVersion);
         System.out.printf("Reversed Version: %s%n", ReversedVersion);
 
-        repeatOrReturn(Main::ReverseTheWords, "Primary School");
+        repeatOrReturn(Group25::ReverseTheWords, "Primary School");
 
     }
 
@@ -355,7 +377,7 @@ public class Main {
      * @param text Input text
      * @return Text with words reversed
      */
-    private static String reverseWordsSymbols(String text) {
+    public static String reverseWordsSymbols(String text) {
         if (text == null || text.isEmpty())
             return text;
         StringBuilder out = new StringBuilder();
@@ -390,7 +412,7 @@ public class Main {
      * @param s Word
      * @return Reversed word
      */
-    private static String reverseRecursive(String s) {
+    public static String reverseRecursive(String s) {
         if (s == null)
             return null;
         if (s.length() <= 1)
@@ -406,7 +428,7 @@ public class Main {
      * @param Text Input text
      * @return Normalized text
      */
-    private static String normalizeSpaces(String Text) {
+    public static String normalizeSpaces(String Text) {
 
         return Text.trim().replaceAll("\\s+", " ");
         // Removes leading and trailing spaces, reduces multiple spaces to a single
@@ -420,7 +442,7 @@ public class Main {
      * @param action The operation to repeat if the user chooses to repeat
      * @param menuName The name of the menu to return to (e.g., "Primary School")
      */
-    private static void repeatOrReturn(Runnable action, String menuName) {
+    public static void repeatOrReturn(Runnable action, String menuName) {
         while (true) {
             System.out.println("\nWhat do you want to:");
             System.out.println("[1] Repeat the same operation");
@@ -444,6 +466,9 @@ public class Main {
 
     static String userInput = "";
 
+    /**
+     * Handles the menu for the Secondary School (Option B) operations.
+     */
     public static void secondaryMenu() {
         userInput = "";
         clearScreen();
@@ -460,35 +485,19 @@ public class Main {
 
                 switch (userInput) {
                     case "1", "Operation 1", "Prime Numbers":
-                        int n;
                         clearScreen();
                         System.out.println("You have selected Prime Numbers");
                         System.out.println("-------------------------------");
 
-                        while (true) {
-                            try {
-                                System.out.print("Enter a positive integer (>=12): ");
-                                n = sc.nextInt();
-                                sc.nextLine();
-
-                                if (n < 12) {
-                                    System.out.println("Error: The number must be 12 or greater.");
-                                    continue;
-                                }
-                                break;
-                            } catch (java.util.InputMismatchException e) {
-                                System.out.println("Invalid input, please enter a number.");
-                                sc.nextLine();
-                            }
-                        }
+                        int n = askIntA("Enter a positive integer (>=12): ", 12, Integer.MAX_VALUE);
 
                         System.out.println("Sieve of Eratosthenes Algorithm");
                         eratosthenes(n);
                         System.out.println("Sieve of Sundaram Algorithm");
                         sundaram(n);
                         System.out.println("Sieve of Atkin Algorithm");
-
                         atkin(n);
+
                         break;
                     case "2", "Operation 2", "Evoluation of Expression":
                         operation2_evaluateExpression();
@@ -739,7 +748,7 @@ public class Main {
      * Main function for Operation 2.
      * Handles the user input loop, validation, and starts the recursive evaluation.
      */
-    private static void operation2_evaluateExpression() {
+    public static void operation2_evaluateExpression() {
         clearScreen();
         System.out.println("You have selected Step-by-step Evaluation of Expression");
         System.out.println("Enter an expression using digits and + - x : ( ). Type 'back' to return.");
@@ -781,7 +790,7 @@ public class Main {
      * 
      * @param currentExpr The expression to be evaluated in this step.
      */
-    private static void solveRecursively(String currentExpr) {
+    public static void solveRecursively(String currentExpr) {
 
         // stop condition
         if (isNumeric(currentExpr)) {
@@ -807,7 +816,7 @@ public class Main {
      * @param expr The current expression string.
      * @return The expression string after performing one step.
      */
-    private static String evaluateOneStep(String expr) {
+    public static String evaluateOneStep(String expr) {
         String cleanedExpr = expr.replace('x', '*').replace(':', '/');
 
         int rParen = cleanedExpr.indexOf(')');
@@ -859,7 +868,7 @@ public class Main {
      * @param expr The expression to solve (e.g., "5*2-4").
      * @return The final result as a string (e.g., "6").
      */
-    private static String reduceFully(String expr) {
+    public static String reduceFully(String expr) {
         String current = expr;
 
         for (int guard = 0; guard < 100; guard++) {
@@ -910,7 +919,7 @@ public class Main {
      * @param opIndex The index of the operator (e.g., '*').
      * @return The new expression string with the operation completed.
      */
-    private static String performOperation(String expr, int opIndex) {
+    public static String performOperation(String expr, int opIndex) {
         char op = expr.charAt(opIndex);
 
         String leftNum = findLeftNumber(expr, opIndex - 1);
@@ -937,7 +946,7 @@ public class Main {
      * @param startIndex The index to start searching from (op_index - 1).
      * @return The found number as a string.
      */
-    private static String findLeftNumber(String s, int startIndex) {
+    public static String findLeftNumber(String s, int startIndex) {
         StringBuilder num = new StringBuilder();
         for (int i = startIndex; i >= 0; i--) {
             char c = s.charAt(i);
@@ -963,7 +972,7 @@ public class Main {
      * @return A string "number;length" (e.g., "-3;2") indicating the number
      *         and how many characters it consumed.
      */
-    private static String findRightNumber(String s, int startIndex) {
+    public static String findRightNumber(String s, int startIndex) {
         StringBuilder num = new StringBuilder();
         int consumedLength = 0;
 
@@ -1005,7 +1014,7 @@ public class Main {
      * @param num2 Right number (e.g., "-3").
      * @return The result as a string (e.g., "-15").
      */
-    private static String calculate(String num1, char op, String num2) {
+    public static String calculate(String num1, char op, String num2) {
         long a = Long.parseLong(num1);
         long b = Long.parseLong(num2);
 
@@ -1099,7 +1108,7 @@ public class Main {
      * @param s The string to clean.
      * @return The cleaned string.
      */
-    private static String tidy(String s) {
+    public static String tidy(String s) {
         String t = s;
         for (int i = 0; i < 2; i++) {
             t = t.replaceAll("\\+\\-", "-")
@@ -1115,7 +1124,7 @@ public class Main {
      * @param s The string to check.
      * @return true if the string is only a number, false otherwise.
      */
-    private static boolean isNumeric(String s) {
+    public static boolean isNumeric(String s) {
         if (s == null || s.isEmpty()) {
             return false;
         }
@@ -1129,7 +1138,7 @@ public class Main {
      * @param s The internal expression string.
      * @return The "pretty" string for the user to see.
      */
-    private static String prettyPrint(String s) {
+    public static String prettyPrint(String s) {
         return s.replace('*', 'x').replace('/', ':');
     }
 
@@ -1225,14 +1234,14 @@ public class Main {
         System.out.println("Geometric Mean: " + geometricMean);
         System.out.println("Harmonic Mean: " + harmonicMean);
 
-        repeatOrReturn(Main::staticinfoArray, "High School");
+        repeatOrReturn(Group25::staticinfoArray, "High School");
     }
 
     /**
      * Calculate Median
      * Calculates the median of an array.
      * 
-     * @param array {@link double[]} the array to calculate the median of
+     * @param array the array to calculate the median of
      * @return the median of the array
      */
     public static double calculateMedian(double[] array) {
@@ -1250,7 +1259,7 @@ public class Main {
      * Calculate Arithmetic Mean
      * Calculates the arithmetic mean of an array.
      * 
-     * @param array {@link double[]} the array to calculate the arithmetic mean of
+     * @param array the array to calculate the arithmetic mean of
      * @return the arithmetic mean of the array
      */
     public static double calculateArithmeticMean(double[] array) {
@@ -1265,7 +1274,7 @@ public class Main {
      * Calculate Geometric Mean
      * Calculates the geometric mean of an array.
      * 
-     * @param array {@link double[]} the array to calculate the geometric mean of
+     * @param array the array to calculate the geometric mean of
      * @return the geometric mean of the array
      */
     public static double calculateGeometricMean(double[] array) {
@@ -1285,7 +1294,7 @@ public class Main {
      * Calculate Harmonic Mean
      * Calculates the harmonic mean of an array.
      * 
-     * @param array {@link double[]} the array to calculate the harmonic mean of
+     * @param array the array to calculate the harmonic mean of
      * @return the harmonic mean of the array
      */
     public static double calculateHarmonicMean(double[] array) {
@@ -1304,8 +1313,8 @@ public class Main {
      * Calculate Reciprocal Sum Recursively
      * Calculates the reciprocal sum of an array recursively.
      * 
-     * @param array {@link double[]} the array to calculate the reciprocal sum of
-     * @param index {@link int} the index to calculate the reciprocal sum of
+     * @param array the array to calculate the reciprocal sum of
+     * @param index the index to calculate the reciprocal sum of
      * @return the reciprocal sum of the array
      */
     public static double calculateReciprocalSumRecursive(double[] array, int index) {
@@ -1329,8 +1338,6 @@ public class Main {
      * (a · b) / (||a|| * ||b||), where ||v|| = sqrt(Σ v_i^2).
      * Returns 0 if either vector has zero magnitude.
      *
-     * @param a first integer vector
-     * @param b second integer vector
      */
     public static void distanceBetweenArrays() {
         int n = 0;
@@ -1371,14 +1378,14 @@ public class Main {
         System.out.printf("Euclidean Distance: %.3f\n", euclidean);
         System.out.printf("Cosine Similarity: %.3f\n", cosinesim);
 
-        repeatOrReturn(Main::distanceBetweenArrays, "High School");
+        repeatOrReturn(Group25::distanceBetweenArrays, "High School");
     }
 
     /**
      * Validate Integer
      * Validates an integer input.
      * 
-     * @param message {@link String} the message to display
+     * @param message the message to display
      * @return the validated integer
      */
     public static int validInteger(String message) {
@@ -1401,8 +1408,8 @@ public class Main {
      * Calculate Manhattan Distance
      * Calculates the Manhattan distance between two arrays.
      * 
-     * @param a {@link int[]} the first array
-     * @param b {@link int[]} the second array
+     * @param a the first array
+     * @param b the second array
      * @return the Manhattan distance between the two arrays
      */
     public static double manhattanDistance(int[] a, int[] b) {
@@ -1417,8 +1424,8 @@ public class Main {
      * Calculate Euclidean Distance
      * Calculates the Euclidean distance between two arrays.
      * 
-     * @param a {@link int[]} the first array
-     * @param b {@link int[]} the second array
+     * @param a the first array
+     * @param b the second array
      * @return the Euclidean distance between the two arrays
      */
     public static double euclideanDistance(int[] a, int[] b) {
@@ -1433,8 +1440,8 @@ public class Main {
      * Calculate Cosine Similarity
      * Calculates the cosine similarity between two arrays.
      * 
-     * @param a {@link int[]} the first array
-     * @param b {@link int[]} the second array
+     * @param a the first array
+     * @param b the second array
      * @return the cosine similarity between the two arrays
      */
     public static double cosineSimilarity(int[] a, int[] b) {
@@ -1457,6 +1464,9 @@ public class Main {
 
     // -------------------------------OPTION-D-UNIVERSITY-------------------------------
 
+    /**
+     * Handles the connectfour menu when user enter option D in the main menu.
+     */
     public static void connectFourMenu() {
         while (true) {
             System.out.println("=== D) University == Connect Four ===");
@@ -1472,16 +1482,20 @@ public class Main {
                 return; // Returns to main (and exits)
             } else {
                 clearScreen();
-                System.out.println("Invalid choice!");
+                System.out.println("Invalid choice! Please choose 1 or 2");
             }
         }
     }
 
+    /**
+     * Handles how the game goes after the menu screen.
+     */
     public static void connectFourFlow() {
+        Random rng = new Random();
         clearScreen();
         System.out.println("Choose board size:");
         System.out.println("(1) 5x4  (2) 6x5  (3) 7x6");
-        int ch = askInt("Choice: ", 1, 3);
+        int ch = askIntA("Choice: ", 1, 3);
         clearScreen();
 
         int rows, cols;
@@ -1548,12 +1562,13 @@ public class Main {
 
             if (!p1Turn && vsCpu) {
 
-                for (int c = 0; c < cols; c++) {
-                    if (!isColumnFull(board, c)) {
-                        col = c;
-                        break;
-                    }
-                }
+                // for (int c = 0; c < cols; c++) {
+                //     if (!isColumnFull(board, c)) {
+                //         col = c;
+                //         break;
+                //     }
+                // }
+                col = computerMove(board, 'O', 'X', rng);
 
             } else {
                 System.out.print("Column (1-" + cols + ") or Q (quit): ");
@@ -1726,7 +1741,6 @@ public class Main {
 
     /**
      * Determines the computer's (AI) next move.
-     * (Note: This method is not called in the current 'connectFourFlow').
      *
      * @param board The game board.
      * @param me    The computer's disc ('O').
@@ -1824,6 +1838,9 @@ public class Main {
         }
     }
 
+    /**
+     * Pauses the program until the user presses the Enter key.
+     */
     public static void pause() {
         System.out.print("Press Enter to continue...");
         sc.nextLine();
@@ -1843,45 +1860,62 @@ public class Main {
         }
     }
 
+    private static final String RESET = "\u001B[0m";
+    private static final String RED = "\u001B[31m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String YELLOW = "\u001B[33m";
+    private static final String BLUE = "\u001B[34m";
+    private static final String MAGENTA = "\u001B[35m";
+    private static final String CYAN = "\u001B[36m";
+    private static final String WHITE = "\u001B[37m";
+
     /**
-     * Prompts the user to enter an integer within a specified range [min, max].
-     * Keeps asking until valid input is received.
-     *
-     * @param prompt The message to display to the user (e.g., "Choice: ").
-     * @param min    The minimum acceptable value.
-     * @param max    The maximum acceptable value.
-     * @return The valid integer entered by the user.
+     * Displays our ASCII message
      */
-    public static int askInt(String prompt, int min, int max) {
-        while (true) {
-            System.out.print(prompt);
-            String input = sc.nextLine().trim();
+    public static void displayWelcomeMessage() {
+                String art = BLUE
+                                + """
+                                                  _________                     .__     _____                      .__               .__
+                                                 /   _____/ ____ _____________  |__|   /  _  \\____________  ______ |  | _____ _______|  |
+                                                 \\_____  \\_/ __ \\\\___   /\\__  \\ |  |  /  /_\\\\  \\_  __ \\\\__  \\ \\____ \\|  | \\\\__  \\\\_  __ \\  |
+                                                 /        \\  ___/ /    /  / __ \\|  | /    |    \\  | \\\\/ __ \\|  |_> >  |__/ __ \\|  | \\\\/  |__
+                                                /_______  /\\___  >_____ \\(____  /__| \\____|__  /__|  (____  /   __/|____(____  /__|  |____/
+                                                /        \\/     \\/      \\/     \\/             \\/           \\/|__|             \\/
+                                                """
+                                + RESET
+                                + YELLOW
+                                + """
+                                                ___________                  .__                    ___________
+                                                \\__    ___/_ __  ____ _____  |  |__ _____    ____   \\__    ___/_ __________ ____
+                                                  |    | |  |  \\/    \\\\__  \\ |  |  \\\\__  \\  /    \\    |    | |  |  \\\\___   // __ \\
+                                                  |    | |  |  /   |  \\/ __ \\|   Y  \\/ __ \\|   |  \\   |    | |  |  //    /\\  ___/
+                                                  |____| |____/|___|  (____  /___|  (____  /___|  /   |____| |____//_____ \\\\___  >
+                                                                    \\/     \\/     \\/     \\/     \\/                       \\/    \\/
+                                                """
+                                + RESET
+                                + RED
+                                + """
+                                                   _____         .__                    ________
+                                                  /  _  \\ ___.__.|  |__ _____    ____   \\_____  \\   ____   ___________
+                                                 /  /_\\\\  <   |  ||  |  \\\\__  \\  /    \\   /   |   \\ /    \\_/ __ \\_  __ \\
+                                                /    |    \\\\___  ||   Y  \\/ __ \\|   |  \\ /    |    \\   |  \\  ___/|  | \\/
+                                                \\____|__  / ____||___|  (____  /___|  / \\_______  /___|  /\\___  >__|
+                                                        \\/\\/          \\/     \\/     \\/          \\/     \\/     \\/
+                                                """
+                                + RESET
+                                + GREEN
+                                + """
+                                                __________.__.__         .__     ____  __.     .__
+                                                \\______   \\__|  | _____  |  |   |    |/ _|____ |  |   ____   ______
+                                                 |    |  _/  |  | \\\\__  \\ |  |   |      <_/ __ \\|  | _/ __ \\ /  ___/
+                                                 |    |   \\  |  |__/ __ \\|  |__ |    |  \\  ___/|  |_\\  ___/ \\___ \\
+                                                 |______  /__|____(____  /____/ |____|__ \\___  >____/\\___  >____  >
+                                                        \\/             \\/               \\/   \\/          \\/     \\/
+                                                """
+                                + RESET;
 
-            boolean numeric = true;
-            for (int i = 0; i < input.length(); i++) {
-                char ch = input.charAt(i);
-                if (ch < '0' || ch > '9') {
-                    numeric = false;
-                    break;
-                }
-            }
-
-            if (!numeric || input.isEmpty()) {
-                System.out.println("Incorrect entry. Please enter a number.");
-                continue;
-            }
-
-            int value = 0;
-            for (int i = 0; i < input.length(); i++) {
-                value = value * 10 + (input.charAt(i) - '0');
-            }
-
-            if (value < min || value > max) {
-                System.out.println("The number must be between " + min + " and " + max + ".");
-                continue;
-            }
-
-            return value;
+                System.out.println(art);
+                System.out.println(RESET + "\nGroup 25 | Sezai Araplarlı | Tunahan Tuze | Ayhan Öner | Bilal Keleş\n");
         }
-    }
+
 }
