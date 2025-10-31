@@ -60,8 +60,15 @@ public class Main {
     }
 
     public static void clearScreen() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
+        try {
+            if (System.getProperty("os.name").contains("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                new ProcessBuilder("clear").inheritIO().start().waitFor();
+            }
+        } catch (Exception e) {
+            System.out.println("Konsol temizlenemedi: " + e.getMessage());
+        }
     }
 
     // -------------------------------OPTION-A-PRIMARY-SCHOOL-------------------------------
@@ -73,11 +80,11 @@ public class Main {
      * 2) Reverse the Words
      * 3) Back to Main Menu
      */
-    public static void runPrimarySchool(){
+    public static void runPrimarySchool() {
         clearScreen();
-       
-        while (true){
-            
+
+        while (true) {
+
             System.out.println("\n----- PRIMARY SCHOOL MENU -----");
             System.out.println("[1] Age and Zodiac Sign Detection");
             System.out.println("[2] Reverse the Words");
@@ -87,13 +94,14 @@ public class Main {
 
             String choice = sc.nextLine().trim();
 
-            switch (choice){
+            switch (choice) {
 
                 case "1":
                     AgeAndZodiacDetection();
                     break;
                 case "2":
-                    ReverseTheWords();;
+                    ReverseTheWords();
+                    ;
                     break;
                 case "3":
                     System.out.println("Returning to the Main Menu...");
@@ -101,25 +109,24 @@ public class Main {
                 default:
                     System.out.println("Invalid selection! Please select one of 1-3.");
 
-
             }
         }
     }
 
-     /**
+    /**
      * Gets user's birth date and today's date, then calculates
      * the age and zodiac sign. Does not allow ages over 100 years.
      */
-    private static void AgeAndZodiacDetection(){
+    private static void AgeAndZodiacDetection() {
 
         clearScreen();
         System.out.println("\n---- Age and Zodiac Sign Detection ----");
-        
-        int day = askIntA("Day of birth (1-31): ",1, 31);
-        int month = askIntA("Month of birth (1-12): ",1, 12);
-        int year = askIntA("Year of birth (exp: 1990): ",1900, 2025);
 
-        if(!isValidDate(year, month, day)){
+        int day = askIntA("Day of birth (1-31): ", 1, 31);
+        int month = askIntA("Month of birth (1-12): ", 1, 12);
+        int year = askIntA("Year of birth (exp: 1990): ", 1900, 2025);
+
+        if (!isValidDate(year, month, day)) {
             System.out.println("Invalid date! Please try again. ");
             return;
         }
@@ -133,18 +140,18 @@ public class Main {
             System.out.println("Age cannot be greater than 100! Please try again.");
             return;
         }
-        
+
         calculateAge(day, month, year, currentDay, currentMonth, currentYear);
-        
+
         repeatOrReturn(Main::AgeAndZodiacDetection);
     }
 
-     /**
+    /**
      * Asks the user to enter an integer and checks if it is valid.
      *
      * @param message The message shown to the user
-     * @param min The minimum valid value
-     * @param max The maximum valid value
+     * @param min     The minimum valid value
+     * @param max     The maximum valid value
      * @return The integer entered by the user
      */
     private static int askIntA(String message, int min, int max) {
@@ -166,37 +173,42 @@ public class Main {
     /**
      * Checks if the given year, month, and day form a valid date.
      *
-     * @param year Year
+     * @param year  Year
      * @param month Month
-     * @param day Day
+     * @param day   Day
      * @return True if the date is valid, false otherwise
      */
-    
-    private static boolean isValidDate(int year, int month, int day){
-        if (month < 1 || month > 12 || day < 1 || day >31)  // Checks if the month is between 1-12 and the day is between 1-31.
-        return false;
+
+    private static boolean isValidDate(int year, int month, int day) {
+        if (month < 1 || month > 12 || day < 1 || day > 31) // Checks if the month is between 1-12 and the day is
+                                                            // between 1-31.
+            return false;
 
         int daysInMonth = calculateDaysInMonth(month, year);
         return day <= daysInMonth;
         // şubat 29-28 farkını calculateDaysInMonth kullanarak hesaplarız.
     }
 
-    /* 1) If the birthdate is greater than today's day, we borrow days from the previous month and decrease the previous month by 1.
-    *  2) If the birthdate is greater than today's month, we borrow months from the previous year, decrease the year by 1 and increase the month by 12.
-    */ 
-    
-     /**
-     * Calculates the user's age and zodiac sign based on birth date 
+    /*
+     * 1) If the birthdate is greater than today's day, we borrow days from the
+     * previous month and decrease the previous month by 1.
+     * 2) If the birthdate is greater than today's month, we borrow months from the
+     * previous year, decrease the year by 1 and increase the month by 12.
+     */
+
+    /**
+     * Calculates the user's age and zodiac sign based on birth date
      * and today's date. Displays the results in years, months, and days.
      */
-    private static void calculateAge(int birthDay, int birthMonth, int birthYear, int currentDay, int currentMonth, int currentYear) {
+    private static void calculateAge(int birthDay, int birthMonth, int birthYear, int currentDay, int currentMonth,
+            int currentYear) {
 
         if (birthYear > currentYear ||
-        (birthYear == currentYear && birthMonth > currentMonth) ||
-        (birthYear == currentYear && birthMonth == currentMonth && birthDay > currentDay)) {
-        System.out.println("You entered a future date. Returning to menu...");
-        return;
-    }
+                (birthYear == currentYear && birthMonth > currentMonth) ||
+                (birthYear == currentYear && birthMonth == currentMonth && birthDay > currentDay)) {
+            System.out.println("You entered a future date. Returning to menu...");
+            return;
+        }
 
         int day = currentDay;
         int month = currentMonth;
@@ -205,97 +217,120 @@ public class Main {
         if (birthDay > day) {
             month -= 1;
 
-            if (month == 0){
+            if (month == 0) {
                 month = 12;
-                year -=1;
+                year -= 1;
             }
-            day += calculateDaysInMonth(month, year);  
+            day += calculateDaysInMonth(month, year);
         }
 
-        if (birthMonth > month){
-            month +=12;  
-            year -=1;    
+        if (birthMonth > month) {
+            month += 12;
+            year -= 1;
         }
 
         int years = year - birthYear;
-        int months = month - birthMonth;    
+        int months = month - birthMonth;
         int days = day - birthDay;
 
         System.out.println("\n--------------------------");
-        System.out.printf("Your age is: %d years, %d months, and %d days.%n",years, months, days);
+        System.out.printf("Your age is: %d years, %d months, and %d days.%n", years, months, days);
 
         String zodiac = calculateZodiacSign(birthDay, birthMonth);
         System.out.printf("Your zodiac sign is: %s%n", zodiac);
         System.out.println("---------------------");
-        
+
     }
 
-     /**
+    /**
      * Calculates how many days are in a given month and year.
      * Accounts for leap years.
      *
      * @param month Month (1-12)
-     * @param year Year
+     * @param year  Year
      * @return Number of days in the month
      */
-    private static int calculateDaysInMonth(int month, int year){
+    private static int calculateDaysInMonth(int month, int year) {
 
-        switch (month){
+        switch (month) {
 
-            case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+            case 1:
+            case 3:
+            case 5:
+            case 7:
+            case 8:
+            case 10:
+            case 12:
                 return 31;
 
-            case 4: case 6: case 9: case 11:
+            case 4:
+            case 6:
+            case 9:
+            case 11:
                 return 30;
 
             case 2:
-            /* February occurs on the 29th day every 4 years. If the year is divisible by 400, it is a leap year.
-            * If the year is divisible by 100 but not by 400, it is not a leap year.
-            * If the year is divisible by 4 but not by 100, it is a leap year.
-            */
-            if ((year % 400 == 0) || (year %4 == 0 && year % 100 != 0)){
-                return 29;
-            }
-            else {
-                return 28;
-            }
+                /*
+                 * February occurs on the 29th day every 4 years. If the year is divisible by
+                 * 400, it is a leap year.
+                 * If the year is divisible by 100 but not by 400, it is not a leap year.
+                 * If the year is divisible by 4 but not by 100, it is a leap year.
+                 */
+                if ((year % 400 == 0) || (year % 4 == 0 && year % 100 != 0)) {
+                    return 29;
+                } else {
+                    return 28;
+                }
             default:
-            return 0;
-        } 
+                return 0;
+        }
     }
-     /**
+
+    /**
      * Determines the zodiac sign based on day and month.
      *
-     * @param day Day
+     * @param day   Day
      * @param month Month
      * @return Zodiac sign as a string
      */
 
-    private static String calculateZodiacSign(int day, int month){
+    private static String calculateZodiacSign(int day, int month) {
 
-        if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) return "Aquarius";
-        if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) return "Pisces";
-        if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) return "Aries";
-        if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) return "Taurus";
-        if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) return "Gemini";
-        if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) return "Cancer";
-        if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) return "Leo";
-        if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) return "Virgo";
-        if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) return "Libra";
-        if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) return "Scorpio";
-        if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) return "Sagittarius";
-        if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) return "Capricorn";
+        if ((month == 1 && day >= 20) || (month == 2 && day <= 18))
+            return "Aquarius";
+        if ((month == 2 && day >= 19) || (month == 3 && day <= 20))
+            return "Pisces";
+        if ((month == 3 && day >= 21) || (month == 4 && day <= 19))
+            return "Aries";
+        if ((month == 4 && day >= 20) || (month == 5 && day <= 20))
+            return "Taurus";
+        if ((month == 5 && day >= 21) || (month == 6 && day <= 20))
+            return "Gemini";
+        if ((month == 6 && day >= 21) || (month == 7 && day <= 22))
+            return "Cancer";
+        if ((month == 7 && day >= 23) || (month == 8 && day <= 22))
+            return "Leo";
+        if ((month == 8 && day >= 23) || (month == 9 && day <= 22))
+            return "Virgo";
+        if ((month == 9 && day >= 23) || (month == 10 && day <= 22))
+            return "Libra";
+        if ((month == 10 && day >= 23) || (month == 11 && day <= 21))
+            return "Scorpio";
+        if ((month == 11 && day >= 22) || (month == 12 && day <= 21))
+            return "Sagittarius";
+        if ((month == 12 && day >= 22) || (month == 1 && day <= 19))
+            return "Capricorn";
         return "Unknown";
     }
 
-    private static void ReverseTheWords(){
+    private static void ReverseTheWords() {
         clearScreen();
 
         System.out.println("\n----- Reverse the words ----");
         System.out.println("Please Enter a Sentence:");
         String sentence = sc.nextLine();
 
-        if (sentence == null || sentence.trim().isEmpty()){
+        if (sentence == null || sentence.trim().isEmpty()) {
             System.out.println("You entered an empty sentence. Returning to menu");
             return;
         }
@@ -310,37 +345,35 @@ public class Main {
 
     }
 
-       /**
+    /**
      * Reverses words in a string. Words with 2 or more letters are reversed,
      * single letters remain the same.
      *
      * @param text Input text
      * @return Text with words reversed
      */
-    private static String reverseWordsSymbols(String text){
-        if(text == null || text.isEmpty())
+    private static String reverseWordsSymbols(String text) {
+        if (text == null || text.isEmpty())
             return text;
         StringBuilder out = new StringBuilder();
         int i = 0;
         int n = text.length();
 
-        while (i < n){
+        while (i < n) {
             char character = text.charAt(i);
-            if(Character.isLetter(character)){
+            if (Character.isLetter(character)) {
                 int j = i;
-                while(j < n && Character.isLetter(text.charAt(j)))
-                j++;
+                while (j < n && Character.isLetter(text.charAt(j)))
+                    j++;
                 String word = text.substring(i, j);
 
-                if (word.length() >= 2){
+                if (word.length() >= 2) {
                     out.append(reverseRecursive(word));
-                }
-                else{
-                    out.append(word);  
+                } else {
+                    out.append(word);
                 }
                 i = j;
-            }
-            else{
+            } else {
                 out.append(character);
                 i++;
             }
@@ -348,34 +381,36 @@ public class Main {
         return out.toString();
     }
 
-     /**
+    /**
      * Recursively reverses a single word.
      *
      * @param s Word
      * @return Reversed word
      */
-    private static String reverseRecursive(String s){
-        if( s == null)
+    private static String reverseRecursive(String s) {
+        if (s == null)
             return null;
-        if( s.length() <= 1)
+        if (s.length() <= 1)
             return s;
         return reverseRecursive(s.substring(1)) + s.charAt(0);
     }
 
-     /**
+    /**
      * Normalizes spaces in a string.
-     * Trims leading and trailing spaces and replaces multiple spaces with a single space.
+     * Trims leading and trailing spaces and replaces multiple spaces with a single
+     * space.
      *
      * @param Text Input text
      * @return Normalized text
      */
-    private static String normalizeSpaces(String Text){
+    private static String normalizeSpaces(String Text) {
 
         return Text.trim().replaceAll("\\s+", " ");
-       // Removes leading and trailing spaces, reduces multiple spaces to a single space.
+        // Removes leading and trailing spaces, reduces multiple spaces to a single
+        // space.
     }
 
-     /**
+    /**
      * Gives the user the option to repeat an operation or return to the main menu.
      *
      * @param action The operation to repeat if the user chooses to repeat
@@ -387,13 +422,13 @@ public class Main {
             System.out.println("[2] Return to Primary School Menu");
             System.out.print("Your choice: ");
             String again = sc.nextLine().trim();
-    
+
             switch (again) {
                 case "1":
                     action.run();
-                    return; 
+                    return;
                 case "2":
-                    return; 
+                    return;
                 default:
                     System.out.println("Invalid choice. Please select 1 or 2.");
             }
@@ -416,8 +451,6 @@ public class Main {
                 System.out.println("Type 'exit' to leave");
                 System.out.print("Enter an operation: ");
 
-                
-
                 userInput = sc.nextLine();
 
                 switch (userInput) {
@@ -426,18 +459,18 @@ public class Main {
                         clearConsole();
                         System.out.println("You have selected Prime Numbers");
                         System.out.println("-------------------------------");
-                        
+
                         while (true) {
                             try {
                                 System.out.print("Enter a positive integer (>=12): ");
                                 n = sc.nextInt();
                                 sc.nextLine();
-                                
-                                if (n < 12) { 
+
+                                if (n < 12) {
                                     System.out.println("Error: The number must be 12 or greater.");
                                     continue;
                                 }
-                                break; 
+                                break;
                             } catch (java.util.InputMismatchException e) {
                                 System.out.println("Invalid input, please enter a number.");
                                 sc.nextLine();
@@ -720,11 +753,12 @@ public class Main {
         System.out.println("You have selected Step-by-step Evaluation of Expression");
         System.out.println("Enter an expression using digits and + - x : ( ). Type 'back' to return.");
         System.out.println("-------------------------------");
-        
+
         while (true) {
             System.out.print("expr> ");
             String expr = sc.nextLine();
-            if (expr == null) continue;
+            if (expr == null)
+                continue;
             expr = expr.trim();
             if (expr.equalsIgnoreCase("back")) {
                 clearConsole();
@@ -738,7 +772,7 @@ public class Main {
 
             try {
                 String currentExpr = expr.replaceAll("\\s+", "").replaceAll("\\(\\+", "(");
-                
+
                 solveRecursively(currentExpr);
 
             } catch (ArithmeticException e) {
@@ -751,19 +785,20 @@ public class Main {
 
     /**
      * This is the RECURSIVE helper function that replaces the while loop.
-     * It evaluates one step, prints it, and then calls itself with the new expression.
+     * It evaluates one step, prints it, and then calls itself with the new
+     * expression.
+     * 
      * @param currentExpr The expression to be evaluated in this step.
      */
     private static void solveRecursively(String currentExpr) {
 
-        //stop condition
+        // stop condition
         if (isNumeric(currentExpr)) {
             return;
         }
 
-
         String nextStep = evaluateOneStep(currentExpr);
-        
+
         System.out.println("= " + prettyPrint(nextStep));
 
         solveRecursively(nextStep);
@@ -777,6 +812,7 @@ public class Main {
      * 3. Simplify adjacent operators -- -> +, +- -> -, -+ -> -
      * 4. Multiplication / Division
      * 5. Addition / Subtraction
+     * 
      * @param expr The current expression string.
      * @return The expression string after performing one step.
      */
@@ -791,7 +827,7 @@ public class Main {
             String newExpr = cleanedExpr.substring(0, lParen) + result + cleanedExpr.substring(rParen + 1);
             return tidy(newExpr);
         }
-        
+
         Matcher m = Pattern.compile("\\((\\-?[0-9]+)\\)").matcher(cleanedExpr);
         if (m.find()) {
             return cleanedExpr.substring(0, m.start()) + m.group(1) + cleanedExpr.substring(m.end());
@@ -814,7 +850,7 @@ public class Main {
             }
         }
 
-        for (int i = 1; i < cleanedExpr.length(); i++) { 
+        for (int i = 1; i < cleanedExpr.length(); i++) {
             char c = cleanedExpr.charAt(i);
             if (c == '+' || c == '-') {
                 return performOperation(cleanedExpr, i);
@@ -1013,7 +1049,6 @@ public class Main {
         if (noSpaces.isEmpty())
             return false;
 
-
         if (!noSpaces.matches("^[0-9()+\\-x:]+$"))
             return false;
 
@@ -1028,7 +1063,7 @@ public class Main {
             }
         }
         if (balance != 0)
-            return false; 
+            return false;
 
         if (noSpaces.matches(".*[0-9]\\(.*") || noSpaces.matches(".*\\)[0-9].*") || noSpaces.contains(")("))
             return false;
@@ -1109,163 +1144,175 @@ public class Main {
 
     // -------------------------------OPTION-C-HIGH-SCHOOL-------------------------------
 
-    /** High School Menu
-	 * Displays a menu with options to calculate statistical information about an array or distance between two arrays.
-	 */
-	public static void HighSchoolMenu() {
-		while (true) {
-			System.out.println("\n----- High School Menu -----");
-			System.out.println("[1] Statistical Information about an Array");
-			System.out.println("[2] Distance between Two Arrays");
-			System.out.println("[3] Return to Main Menu");
-			System.out.print("Choose an option: ");
-			String option = sc.nextLine();
+    /**
+     * High School Menu
+     * Displays a menu with options to calculate statistical information about an
+     * array or distance between two arrays.
+     */
+    public static void HighSchoolMenu() {
+        while (true) {
+            System.out.println("\n----- High School Menu -----");
+            System.out.println("[1] Statistical Information about an Array");
+            System.out.println("[2] Distance between Two Arrays");
+            System.out.println("[3] Return to Main Menu");
+            System.out.print("Choose an option: ");
+            String option = sc.nextLine();
 
-			switch (option) {
-				case "1":
+            switch (option) {
+                case "1":
                     staticinfoArray();
-					break;
-				case "2":
-					distanceBetweenArrays();
-					break;
-				case "3":
-					System.out.println("\nReturning to Main Menu...");
-					return;
-				default:
-					System.out.println("\nInvalid option. Please try again.");
-					break;
-			}
-		}
-	}
-
-	/** Statistical Information about an Array
-	 * Prompts the user for the array size and double elements.
-	 * Computes and prints: median, arithmetic mean, geometric mean, and harmonic mean.
-	 * The harmonic mean is computed using a recursive reciprocal-sum helper. For even-sized arrays, the median is the average of the two middle elements after sorting.
-	 */
-	public static void staticinfoArray() {
-		int n = 0;
-		while (true) {
-			try{
-				System.out.print("Enter the number of elements in the array: ");
-				n = Integer.parseInt(sc.nextLine());
-				if (n > 0)
-				{
-					break;
-				}
-				else {
-					System.out.println("\nArray must be positive. Please try again.");
-				}
-				}catch (NumberFormatException e) {
-				System.out.println("\nInvalid input. Please enter a positive integer.");
-			}
-		}
-
-		double[] array = new double[n];
-
-		System.out.println("For double values use dot (.) instead of comma (,) . eg: 1.5");
-
-		for (int i = 0; i < n; i++) {
-			while (true)
-			{
-				try {
-					System.out.print("Enter the element " + (i + 1) + ": ");
-					array[i] = Double.parseDouble(sc.nextLine());
-					break;
-				}catch (NumberFormatException e) {
-					System.out.println("\nInvalid input. Please enter a valid number.");
-				}
-			}
-		}
-
-		double median = calculateMedian(array);
-
-		double arithmeticMean = calculateArithmeticMean(array);
-
-		double geometricMean = calculateGeometricMean(array);
-
-		double harmonicMean = calculateHarmonicMean(array);
-
-		System.out.println("\n--- Results ---");
-		System.out.println("Array: " + Arrays.toString(array));
-		System.out.println("Median: " + median);
-		System.out.println("Arithmetic Mean: " + arithmeticMean);
-		System.out.println("Geometric Mean: " + geometricMean);
-		System.out.println("Harmonic Mean: " + harmonicMean);
-	}
-
-	/** Calculate Median
-	 * Calculates the median of an array.
-	 * @param array {@link double[]} the array to calculate the median of
-	 * @return the median of the array
-	 */
-	public static double calculateMedian(double[] array) {
-		int n = array.length;
-		Arrays.sort(array);
-
-		if (n % 2 == 1) {
-			return array[n / 2];
-		} else {
-			return (array[n / 2 - 1] + array[n / 2]) / 2.0;
-		}
-	}
-
-	/** Calculate Arithmetic Mean
-	 * Calculates the arithmetic mean of an array.
-	 * @param array {@link double[]} the array to calculate the arithmetic mean of
-	 * @return the arithmetic mean of the array
-	 */
-	public static double calculateArithmeticMean(double[] array) {
-		double sum = 0;
-		for (double num : array) {
-			sum += num;
-		}
-		return sum / array.length;
-	}
-
-	/** Calculate Geometric Mean
-	 * Calculates the geometric mean of an array.
-	 * @param array {@link double[]} the array to calculate the geometric mean of
-	 * @return the geometric mean of the array
-	 */
-	public static double calculateGeometricMean(double[] array) {
-		double sum = 1.0;
-
-		for (double num : array) {
-			if (num <= 0){
-				System.out.println("\nGeometric mean cannot be calculated with non-positive values.");
-				return 0;
-			}
-			sum *= num;
-		}
-		return Math.pow(sum, 1.0 / array.length);
-	}
-
-	/** Calculate Harmonic Mean
-	 * Calculates the harmonic mean of an array.
-	 * @param array {@link double[]} the array to calculate the harmonic mean of
-	 * @return the harmonic mean of the array
-	 */
-	public static double calculateHarmonicMean(double[] array)
-    {
-       if (array.length == 0) return 0.0;
-       
-       double sumOfReciprocals = calculateReciprocalSumRecursive(array, array.length - 1);
-       
-       if (sumOfReciprocals == 0) {
-           return 0.0; 
-       }
-       return array.length / sumOfReciprocals;
+                    break;
+                case "2":
+                    distanceBetweenArrays();
+                    break;
+                case "3":
+                    System.out.println("\nReturning to Main Menu...");
+                    return;
+                default:
+                    System.out.println("\nInvalid option. Please try again.");
+                    break;
+            }
+        }
     }
-    
-	/** Calculate Reciprocal Sum Recursively
-	 * Calculates the reciprocal sum of an array recursively.
-	 * @param array {@link double[]} the array to calculate the reciprocal sum of
-	 * @param index {@link int} the index to calculate the reciprocal sum of
-	 * @return the reciprocal sum of the array
-	 */
-    public static double calculateReciprocalSumRecursive(double[] array, int index)
-    {
+
+    /**
+     * Statistical Information about an Array
+     * Prompts the user for the array size and double elements.
+     * Computes and prints: median, arithmetic mean, geometric mean, and harmonic
+     * mean.
+     * The harmonic mean is computed using a recursive reciprocal-sum helper. For
+     * even-sized arrays, the median is the average of the two middle elements after
+     * sorting.
+     */
+    public static void staticinfoArray() {
+        int n = 0;
+        while (true) {
+            try {
+                System.out.print("Enter the number of elements in the array: ");
+                n = Integer.parseInt(sc.nextLine());
+                if (n > 0) {
+                    break;
+                } else {
+                    System.out.println("\nArray must be positive. Please try again.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("\nInvalid input. Please enter a positive integer.");
+            }
+        }
+
+        double[] array = new double[n];
+
+        System.out.println("For double values use dot (.) instead of comma (,) . eg: 1.5");
+
+        for (int i = 0; i < n; i++) {
+            while (true) {
+                try {
+                    System.out.print("Enter the element " + (i + 1) + ": ");
+                    array[i] = Double.parseDouble(sc.nextLine());
+                    break;
+                } catch (NumberFormatException e) {
+                    System.out.println("\nInvalid input. Please enter a valid number.");
+                }
+            }
+        }
+
+        double median = calculateMedian(array);
+
+        double arithmeticMean = calculateArithmeticMean(array);
+
+        double geometricMean = calculateGeometricMean(array);
+
+        double harmonicMean = calculateHarmonicMean(array);
+
+        System.out.println("\n--- Results ---");
+        System.out.println("Array: " + Arrays.toString(array));
+        System.out.println("Median: " + median);
+        System.out.println("Arithmetic Mean: " + arithmeticMean);
+        System.out.println("Geometric Mean: " + geometricMean);
+        System.out.println("Harmonic Mean: " + harmonicMean);
+    }
+
+    /**
+     * Calculate Median
+     * Calculates the median of an array.
+     * 
+     * @param array {@link double[]} the array to calculate the median of
+     * @return the median of the array
+     */
+    public static double calculateMedian(double[] array) {
+        int n = array.length;
+        Arrays.sort(array);
+
+        if (n % 2 == 1) {
+            return array[n / 2];
+        } else {
+            return (array[n / 2 - 1] + array[n / 2]) / 2.0;
+        }
+    }
+
+    /**
+     * Calculate Arithmetic Mean
+     * Calculates the arithmetic mean of an array.
+     * 
+     * @param array {@link double[]} the array to calculate the arithmetic mean of
+     * @return the arithmetic mean of the array
+     */
+    public static double calculateArithmeticMean(double[] array) {
+        double sum = 0;
+        for (double num : array) {
+            sum += num;
+        }
+        return sum / array.length;
+    }
+
+    /**
+     * Calculate Geometric Mean
+     * Calculates the geometric mean of an array.
+     * 
+     * @param array {@link double[]} the array to calculate the geometric mean of
+     * @return the geometric mean of the array
+     */
+    public static double calculateGeometricMean(double[] array) {
+        double sum = 1.0;
+
+        for (double num : array) {
+            if (num <= 0) {
+                System.out.println("\nGeometric mean cannot be calculated with non-positive values.");
+                return 0;
+            }
+            sum *= num;
+        }
+        return Math.pow(sum, 1.0 / array.length);
+    }
+
+    /**
+     * Calculate Harmonic Mean
+     * Calculates the harmonic mean of an array.
+     * 
+     * @param array {@link double[]} the array to calculate the harmonic mean of
+     * @return the harmonic mean of the array
+     */
+    public static double calculateHarmonicMean(double[] array) {
+        if (array.length == 0)
+            return 0.0;
+
+        double sumOfReciprocals = calculateReciprocalSumRecursive(array, array.length - 1);
+
+        if (sumOfReciprocals == 0) {
+            return 0.0;
+        }
+        return array.length / sumOfReciprocals;
+    }
+
+    /**
+     * Calculate Reciprocal Sum Recursively
+     * Calculates the reciprocal sum of an array recursively.
+     * 
+     * @param array {@link double[]} the array to calculate the reciprocal sum of
+     * @param index {@link int} the index to calculate the reciprocal sum of
+     * @return the reciprocal sum of the array
+     */
+    public static double calculateReciprocalSumRecursive(double[] array, int index) {
         if (index < 0) {
             return 0.0;
         }
@@ -1274,132 +1321,140 @@ public class Main {
             System.out.println("Warning: Zero element skipped for Harmonic Mean calculation.");
             return calculateReciprocalSumRecursive(array, index - 1);
         }
-        
+
         double currentReciprocal = 1.0 / array[index];
-        
+
         return currentReciprocal + calculateReciprocalSumRecursive(array, index - 1);
     }
 
-	/** Distance between Two Arrays
-	 * Computes the Cosine similarity between vectors a and b:
-	 * (a · b) / (||a|| * ||b||), where ||v|| = sqrt(Σ v_i^2).
-	 * Returns 0 if either vector has zero magnitude.
-	 *
-	 * @param a first integer vector
-	 * @param b second integer vector
-	 */
-	public static void distanceBetweenArrays() {
-		int n = 0;
-		while (true) {
-			try {
-				System.out.print("Enter the arrays dimension: ");
-				n = Integer.parseInt(sc.nextLine());
-				if (n > 0){
-					break;
-				} else {
-					System.out.println("\nDimension must be positive. Please try again.");
-				}
-			}catch (NumberFormatException e) {
-				System.out.println("\nInvalid input. Please enter a valid number.");
-			}
-		}
+    /**
+     * Distance between Two Arrays
+     * Computes the Cosine similarity between vectors a and b:
+     * (a · b) / (||a|| * ||b||), where ||v|| = sqrt(Σ v_i^2).
+     * Returns 0 if either vector has zero magnitude.
+     *
+     * @param a first integer vector
+     * @param b second integer vector
+     */
+    public static void distanceBetweenArrays() {
+        int n = 0;
+        while (true) {
+            try {
+                System.out.print("Enter the arrays dimension: ");
+                n = Integer.parseInt(sc.nextLine());
+                if (n > 0) {
+                    break;
+                } else {
+                    System.out.println("\nDimension must be positive. Please try again.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("\nInvalid input. Please enter a valid number.");
+            }
+        }
 
-		int[] a = new int[n];
-		int[] b = new int[n];
+        int[] a = new int[n];
+        int[] b = new int[n];
 
-		System.out.println("Enter the elements of first array.");
-		for (int i = 0; i < n; i++) {
-			a[i] = validInteger("Element " + (i + 1) + ":");
-		}
-		System.out.print("Enter the elements of second array: ");
-		for (int i = 0; i < n; i++) {
-			b[i] = validInteger("Element " + (i + 1) + ":");
-		}
-		double manhattan = manhattanDistance(a, b);
-		double euclidean = euclideanDistance(a, b);
-		double cosinesim = cosineSimilarity(a, b);
+        System.out.println("Enter the elements of first array.");
+        for (int i = 0; i < n; i++) {
+            a[i] = validInteger("Element " + (i + 1) + ":");
+        }
+        System.out.print("Enter the elements of second array: ");
+        for (int i = 0; i < n; i++) {
+            b[i] = validInteger("Element " + (i + 1) + ":");
+        }
+        double manhattan = manhattanDistance(a, b);
+        double euclidean = euclideanDistance(a, b);
+        double cosinesim = cosineSimilarity(a, b);
 
-		System.out.println("\n--- Distance and Similarity Results ---");
-		System.out.println("Array 1: " + Arrays.toString(a));
-		System.out.println("Array 2: " + Arrays.toString(b));
-		System.out.printf("Manhattan Distance: %.3f\n", manhattan);
-		System.out.printf("Euclidean Distance: %.3f\n", euclidean);
-		System.out.printf("Cosine Similarity: %.3f\n", cosinesim);
-	}
+        System.out.println("\n--- Distance and Similarity Results ---");
+        System.out.println("Array 1: " + Arrays.toString(a));
+        System.out.println("Array 2: " + Arrays.toString(b));
+        System.out.printf("Manhattan Distance: %.3f\n", manhattan);
+        System.out.printf("Euclidean Distance: %.3f\n", euclidean);
+        System.out.printf("Cosine Similarity: %.3f\n", cosinesim);
+    }
 
-	/** Validate Integer
-	 * Validates an integer input.
-	 * @param message {@link String} the message to display
-	 * @return the validated integer
-	 */
-	public static int validInteger(String message) {
-		while (true) {
-			System.out.print(message);
-			try {
-				int num = Integer.parseInt(sc.nextLine());
-				if (num >= 0 && num <= 9) {
-					return num;
-				} else {
-					System.out.println("\nInvalid input. Please enter between 0-9.");
-				}
-			} catch (NumberFormatException e) {
-				System.out.println("\nInvalid input. Please enter a number.");
-			}
-		}
-	}
+    /**
+     * Validate Integer
+     * Validates an integer input.
+     * 
+     * @param message {@link String} the message to display
+     * @return the validated integer
+     */
+    public static int validInteger(String message) {
+        while (true) {
+            System.out.print(message);
+            try {
+                int num = Integer.parseInt(sc.nextLine());
+                if (num >= 0 && num <= 9) {
+                    return num;
+                } else {
+                    System.out.println("\nInvalid input. Please enter between 0-9.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("\nInvalid input. Please enter a number.");
+            }
+        }
+    }
 
-	/** Calculate Manhattan Distance
-	 * Calculates the Manhattan distance between two arrays.
-	 * @param a {@link int[]} the first array
-	 * @param b {@link int[]} the second array
-	 * @return the Manhattan distance between the two arrays
-	 */
-	public static double manhattanDistance(int[] a, int[] b) {
-		double distance = 0;
-		for (int i = 0; i < a.length; i++) {
-			distance += Math.abs(a[i] - b[i]);
-		}
-		return distance;
-	}
+    /**
+     * Calculate Manhattan Distance
+     * Calculates the Manhattan distance between two arrays.
+     * 
+     * @param a {@link int[]} the first array
+     * @param b {@link int[]} the second array
+     * @return the Manhattan distance between the two arrays
+     */
+    public static double manhattanDistance(int[] a, int[] b) {
+        double distance = 0;
+        for (int i = 0; i < a.length; i++) {
+            distance += Math.abs(a[i] - b[i]);
+        }
+        return distance;
+    }
 
-	/** Calculate Euclidean Distance
-	 * Calculates the Euclidean distance between two arrays.
-	 * @param a {@link int[]} the first array
-	 * @param b {@link int[]} the second array
-	 * @return the Euclidean distance between the two arrays
-	 */
-	public static double euclideanDistance(int[] a, int[] b) {
-		double distance = 0;
-		for (int i = 0; i < a.length; i++) {
-			distance += Math.pow(a[i] - b[i], 2);
-		}
-		return Math.sqrt(distance);
-	}
+    /**
+     * Calculate Euclidean Distance
+     * Calculates the Euclidean distance between two arrays.
+     * 
+     * @param a {@link int[]} the first array
+     * @param b {@link int[]} the second array
+     * @return the Euclidean distance between the two arrays
+     */
+    public static double euclideanDistance(int[] a, int[] b) {
+        double distance = 0;
+        for (int i = 0; i < a.length; i++) {
+            distance += Math.pow(a[i] - b[i], 2);
+        }
+        return Math.sqrt(distance);
+    }
 
-	/** Calculate Cosine Similarity
-	 * Calculates the cosine similarity between two arrays.
-	 * @param a {@link int[]} the first array
-	 * @param b {@link int[]} the second array
-	 * @return the cosine similarity between the two arrays
-	 */
-	public static double cosineSimilarity(int[] a, int[] b) {
-		double sum = 0;
-		double magA = 0; 
-		double magB = 0; 
+    /**
+     * Calculate Cosine Similarity
+     * Calculates the cosine similarity between two arrays.
+     * 
+     * @param a {@link int[]} the first array
+     * @param b {@link int[]} the second array
+     * @return the cosine similarity between the two arrays
+     */
+    public static double cosineSimilarity(int[] a, int[] b) {
+        double sum = 0;
+        double magA = 0;
+        double magB = 0;
 
-		for (int i = 0; i < a.length; i++) {
-			sum += a[i] * b[i];
-			magA += Math.pow(a[i], 2); 
-			magB += Math.pow(b[i], 2);
-		}
+        for (int i = 0; i < a.length; i++) {
+            sum += a[i] * b[i];
+            magA += Math.pow(a[i], 2);
+            magB += Math.pow(b[i], 2);
+        }
 
-		if (magA == 0 || magB == 0) {
-			return 0;
-		}
+        if (magA == 0 || magB == 0) {
+            return 0;
+        }
 
-		return sum / (Math.sqrt(magA) * Math.sqrt(magB));
-	}
-
+        return sum / (Math.sqrt(magA) * Math.sqrt(magB));
+    }
 
     // -------------------------------OPTION-D-UNIVERSITY-------------------------------
 
