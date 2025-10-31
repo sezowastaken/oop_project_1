@@ -6,10 +6,10 @@ public class highschool {
 		Scanner scanner = new Scanner(System.in);
 		HighSchoolMenu(scanner);
 	}
-/** High School Menu
- * Displays a menu with options to calculate statistical information about an array or distance between two arrays.
- * @param scanner {@link java.util.Scanner} for reading user input
- */
+	/** High School Menu
+	 * Displays a menu with options to calculate statistical information about an array or distance between two arrays.
+	 * @param scanner {@link java.util.Scanner} for reading user input
+	 */
 	public static void HighSchoolMenu(Scanner scanner) {
 		while (true) {
 			System.out.println("\n----- High School Menu -----");
@@ -36,12 +36,12 @@ public class highschool {
 		}
 	}
 
-/** Statistical Information about an Array
- * Prompts the user for the array size and double elements.
- * Computes and prints: median, arithmetic mean, geometric mean, and harmonic mean.
- * The harmonic mean is computed using a recursive reciprocal-sum helper. For even-sized arrays, the median is the average of the two middle elements after sorting.
- * @param scanner {@link java.util.Scanner} for reading user input
- */
+	/** Statistical Information about an Array
+	 * Prompts the user for the array size and double elements.
+	 * Computes and prints: median, arithmetic mean, geometric mean, and harmonic mean.
+	 * The harmonic mean is computed using a recursive reciprocal-sum helper. For even-sized arrays, the median is the average of the two middle elements after sorting.
+	 * @param scanner {@link java.util.Scanner} for reading user input
+	 */
 	public static void staticinfoArray(Scanner scanner) {
 		int n = 0;
 		while (true) {
@@ -93,11 +93,11 @@ public class highschool {
 		System.out.println("Harmonic Mean: " + harmonicMean);
 	}
 
- /** Calculate Median
- * Calculates the median of an array.
- * @param array {@link double[]} the array to calculate the median of
- * @return the median of the array
- */
+	/** Calculate Median
+	 * Calculates the median of an array.
+	 * @param array {@link double[]} the array to calculate the median of
+	 * @return the median of the array
+	 */
 	public static double calculateMedian(double[] array) {
 		int n = array.length;
 		Arrays.sort(array);
@@ -109,11 +109,11 @@ public class highschool {
 		}
 	}
 
- /** Calculate Arithmetic Mean
- * Calculates the arithmetic mean of an array.
- * @param array {@link double[]} the array to calculate the arithmetic mean of
- * @return the arithmetic mean of the array
- */
+	/** Calculate Arithmetic Mean
+	 * Calculates the arithmetic mean of an array.
+	 * @param array {@link double[]} the array to calculate the arithmetic mean of
+	 * @return the arithmetic mean of the array
+	 */
 	public static double calculateArithmeticMean(double[] array) {
 		double sum = 0;
 		for (double num : array) {
@@ -122,11 +122,11 @@ public class highschool {
 		return sum / array.length;
 	}
 
- /** Calculate Geometric Mean
- * Calculates the geometric mean of an array.
- * @param array {@link double[]} the array to calculate the geometric mean of
- * @return the geometric mean of the array
- */
+	/** Calculate Geometric Mean
+	 * Calculates the geometric mean of an array.
+	 * @param array {@link double[]} the array to calculate the geometric mean of
+	 * @return the geometric mean of the array
+	 */
 	public static double calculateGeometricMean(double[] array) {
 		double sum = 1.0;
 
@@ -140,11 +140,11 @@ public class highschool {
 		return Math.pow(sum, 1.0 / array.length);
 	}
 
- /** Calculate Harmonic Mean
- * Calculates the harmonic mean of an array.
- * @param array {@link double[]} the array to calculate the harmonic mean of
- * @return the harmonic mean of the array
- */
+	/** Calculate Harmonic Mean
+	 * Calculates the harmonic mean of an array.
+	 * @param array {@link double[]} the array to calculate the harmonic mean of
+	 * @return the harmonic mean of the array
+	 */
 	public static double calculateHarmonicMean(double[] array)
     {
        if (array.length == 0) return 0.0;
@@ -157,12 +157,12 @@ public class highschool {
        return array.length / sumOfReciprocals;
     }
     
- /** Calculate Reciprocal Sum Recursively
- * Calculates the reciprocal sum of an array recursively.
- * @param array {@link double[]} the array to calculate the reciprocal sum of
- * @param index {@link int} the index to calculate the reciprocal sum of
- * @return the reciprocal sum of the array
- */
+	/** Calculate Reciprocal Sum Recursively
+	 * Calculates the reciprocal sum of an array recursively.
+	 * @param array {@link double[]} the array to calculate the reciprocal sum of
+	 * @param index {@link int} the index to calculate the reciprocal sum of
+	 * @return the reciprocal sum of the array
+	 */
     public static double calculateReciprocalSumRecursive(double[] array, int index)
     {
         if (index < 0) {
@@ -178,15 +178,16 @@ public class highschool {
         
         return currentReciprocal + calculateReciprocalSumRecursive(array, index - 1);
     }
-/** Distance between Two Arrays
- * Computes the Cosine similarity between vectors a and b:
- * (a · b) / (||a|| * ||b||), where ||v|| = sqrt(Σ v_i^2).
- * Returns 0 if either vector has zero magnitude.
- *
- * @param a first integer vector
- * @param b second integer vector
- * @return Cosine similarity in [-1, 1], or 0 if a or b has zero magnitude
- */
+
+	/** Distance between Two Arrays
+	 * Computes the Cosine similarity between vectors a and b:
+	 * (a · b) / (||a|| * ||b||), where ||v|| = sqrt(Σ v_i^2).
+	 * Returns 0 if either vector has zero magnitude.
+	 *
+	 * @param a first integer vector
+	 * @param b second integer vector
+	 * @return Cosine similarity in [-1, 1], or 0 if a or b has zero magnitude
+	 */
 	public static void distanceBetweenArrays(Scanner scanner) {
 		int n = 0;
 		while (true) {
@@ -226,12 +227,12 @@ public class highschool {
 		System.out.printf("Cosine Similarity: %.3f\n", cosinesim);
 	}
 
- /** Validate Integer
- * Validates an integer input.
- * @param scanner {@link java.util.Scanner} for reading user input
- * @param message {@link String} the message to display
- * @return the validated integer
- */
+	/** Validate Integer
+	 * Validates an integer input.
+	 * @param scanner {@link java.util.Scanner} for reading user input
+	 * @param message {@link String} the message to display
+	 * @return the validated integer
+	 */
 	public static int validInteger(Scanner scanner, String message) {
 		while (true) {
 			System.out.print(message);
@@ -248,12 +249,12 @@ public class highschool {
 		}
 	}
 
- /** Calculate Manhattan Distance
- * Calculates the Manhattan distance between two arrays.
- * @param a {@link int[]} the first array
- * @param b {@link int[]} the second array
- * @return the Manhattan distance between the two arrays
- */
+	/** Calculate Manhattan Distance
+	 * Calculates the Manhattan distance between two arrays.
+	 * @param a {@link int[]} the first array
+	 * @param b {@link int[]} the second array
+	 * @return the Manhattan distance between the two arrays
+	 */
 	public static double manhattanDistance(int[] a, int[] b) {
 		double distance = 0;
 		for (int i = 0; i < a.length; i++) {
@@ -262,12 +263,12 @@ public class highschool {
 		return distance;
 	}
 
- /** Calculate Euclidean Distance
- * Calculates the Euclidean distance between two arrays.
- * @param a {@link int[]} the first array
- * @param b {@link int[]} the second array
- * @return the Euclidean distance between the two arrays
- */
+	/** Calculate Euclidean Distance
+	 * Calculates the Euclidean distance between two arrays.
+	 * @param a {@link int[]} the first array
+	 * @param b {@link int[]} the second array
+	 * @return the Euclidean distance between the two arrays
+	 */
 	public static double euclideanDistance(int[] a, int[] b) {
 		double distance = 0;
 		for (int i = 0; i < a.length; i++) {
@@ -276,12 +277,12 @@ public class highschool {
 		return Math.sqrt(distance);
 	}
 
- /** Calculate Cosine Similarity
- * Calculates the cosine similarity between two arrays.
- * @param a {@link int[]} the first array
- * @param b {@link int[]} the second array
- * @return the cosine similarity between the two arrays
- */
+	/** Calculate Cosine Similarity
+	 * Calculates the cosine similarity between two arrays.
+	 * @param a {@link int[]} the first array
+	 * @param b {@link int[]} the second array
+	 * @return the cosine similarity between the two arrays
+	 */
 	public static double cosineSimilarity(int[] a, int[] b) {
 		double sum = 0;
 		double magA = 0; 
