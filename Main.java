@@ -425,9 +425,11 @@ public class Main {
 
             switch (again) {
                 case "1":
+                    clearScreen();
                     action.run();
                     return;
                 case "2":
+                    clearScreen();
                     return;
                 default:
                     System.out.println("Invalid choice. Please select 1 or 2.");
