@@ -59,6 +59,10 @@ public class Main {
         }
     }
 
+    /**
+     * Clears the terminal screen.
+     * Uses 'cls' for Windows and 'clear' for Unix-based systems.
+     */
     public static void clearScreen() {
         try {
             if (System.getProperty("os.name").contains("Windows")) {
@@ -81,10 +85,9 @@ public class Main {
      * 3) Back to Main Menu
      */
     public static void runPrimarySchool() {
-        clearScreen();
 
         while (true) {
-
+            clearScreen();
             System.out.println("\n----- PRIMARY SCHOOL MENU -----");
             System.out.println("[1] Age and Zodiac Sign Detection");
             System.out.println("[2] Reverse the Words");
@@ -118,8 +121,8 @@ public class Main {
      * the age and zodiac sign. Does not allow ages over 100 years.
      */
     private static void AgeAndZodiacDetection() {
-
         clearScreen();
+
         System.out.println("\n---- Age and Zodiac Sign Detection ----");
 
         int day = askIntA("Day of birth (1-31): ", 1, 31);
@@ -143,7 +146,7 @@ public class Main {
 
         calculateAge(day, month, year, currentDay, currentMonth, currentYear);
 
-        repeatOrReturn(Main::AgeAndZodiacDetection);
+        repeatOrReturn(Main::AgeAndZodiacDetection, "Primary School");
     }
 
     /**
@@ -341,7 +344,7 @@ public class Main {
         System.out.printf("Normal Version: %s%n", NormalVersion);
         System.out.printf("Reversed Version: %s%n", ReversedVersion);
 
-        repeatOrReturn(Main::ReverseTheWords);
+        repeatOrReturn(Main::ReverseTheWords, "Primary School");
 
     }
 
@@ -411,25 +414,25 @@ public class Main {
     }
 
     /**
-     * Gives the user the option to repeat an operation or return to the main menu.
+     * Gives the user the option to repeat an operation or return to a specified menu.
+     * (Artık "menuName" parametresi alıyor)
      *
      * @param action The operation to repeat if the user chooses to repeat
+     * @param menuName The name of the menu to return to (e.g., "Primary School")
      */
-    private static void repeatOrReturn(Runnable action) {
+    private static void repeatOrReturn(Runnable action, String menuName) {
         while (true) {
             System.out.println("\nWhat do you want to:");
             System.out.println("[1] Repeat the same operation");
-            System.out.println("[2] Return to Primary School Menu");
+            System.out.printf("[2] Return to %s Menu%n", menuName);
             System.out.print("Your choice: ");
             String again = sc.nextLine().trim();
 
             switch (again) {
                 case "1":
-                    clearScreen();
                     action.run();
                     return;
                 case "2":
-                    clearScreen();
                     return;
                 default:
                     System.out.println("Invalid choice. Please select 1 or 2.");
@@ -443,7 +446,7 @@ public class Main {
 
     public static void secondaryMenu() {
         userInput = "";
-        clearConsole();
+        clearScreen();
         System.out.println("Hello this is the option B");
         System.out.println("-------------------------------");
         while (true) {
@@ -458,7 +461,7 @@ public class Main {
                 switch (userInput) {
                     case "1", "Operation 1", "Prime Numbers":
                         int n;
-                        clearConsole();
+                        clearScreen();
                         System.out.println("You have selected Prime Numbers");
                         System.out.println("-------------------------------");
 
@@ -491,11 +494,13 @@ public class Main {
                         operation2_evaluateExpression();
                         break;
                     case "exit":
-                        clearConsole();
+                        clearScreen();
                         System.out.println("Exiting...");
                         return;
                     default:
                         System.out.println("Invalid option, please try again.");
+                        pause();
+                        clearScreen();
                 }
 
             } catch (Exception e) {
@@ -506,22 +511,6 @@ public class Main {
                     System.out.println("An error occurred: " + e.getMessage());
                 }
             }
-        }
-    }
-
-    /**
-     * Clears the terminal screen.
-     * Uses 'cls' for Windows and 'clear' for Unix-based systems.
-     */
-    public static void clearConsole() {
-        try {
-            if (System.getProperty("os.name").contains("Windows")) {
-                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            } else {
-                new ProcessBuilder("clear").inheritIO().start().waitFor();
-            }
-        } catch (Exception e) {
-            System.out.println("Konsol temizlenemedi: " + e.getMessage());
         }
     }
 
@@ -751,7 +740,7 @@ public class Main {
      * Handles the user input loop, validation, and starts the recursive evaluation.
      */
     private static void operation2_evaluateExpression() {
-        clearConsole();
+        clearScreen();
         System.out.println("You have selected Step-by-step Evaluation of Expression");
         System.out.println("Enter an expression using digits and + - x : ( ). Type 'back' to return.");
         System.out.println("-------------------------------");
@@ -763,7 +752,7 @@ public class Main {
                 continue;
             expr = expr.trim();
             if (expr.equalsIgnoreCase("back")) {
-                clearConsole();
+                clearScreen();
                 break;
             }
 
@@ -1153,6 +1142,7 @@ public class Main {
      */
     public static void HighSchoolMenu() {
         while (true) {
+            clearScreen();
             System.out.println("\n----- High School Menu -----");
             System.out.println("[1] Statistical Information about an Array");
             System.out.println("[2] Distance between Two Arrays");
@@ -1172,6 +1162,7 @@ public class Main {
                     return;
                 default:
                     System.out.println("\nInvalid option. Please try again.");
+                    pause();
                     break;
             }
         }
@@ -1189,6 +1180,7 @@ public class Main {
     public static void staticinfoArray() {
         int n = 0;
         while (true) {
+            clearScreen();
             try {
                 System.out.print("Enter the number of elements in the array: ");
                 n = Integer.parseInt(sc.nextLine());
@@ -1232,6 +1224,8 @@ public class Main {
         System.out.println("Arithmetic Mean: " + arithmeticMean);
         System.out.println("Geometric Mean: " + geometricMean);
         System.out.println("Harmonic Mean: " + harmonicMean);
+
+        repeatOrReturn(Main::staticinfoArray, "High School");
     }
 
     /**
@@ -1341,6 +1335,7 @@ public class Main {
     public static void distanceBetweenArrays() {
         int n = 0;
         while (true) {
+            clearScreen();
             try {
                 System.out.print("Enter the arrays dimension: ");
                 n = Integer.parseInt(sc.nextLine());
@@ -1359,11 +1354,11 @@ public class Main {
 
         System.out.println("Enter the elements of first array.");
         for (int i = 0; i < n; i++) {
-            a[i] = validInteger("Element " + (i + 1) + ":");
+            a[i] = validInteger("Element " + (i + 1) + ": ");
         }
-        System.out.print("Enter the elements of second array: ");
+        System.out.println("Enter the elements of second array: ");
         for (int i = 0; i < n; i++) {
-            b[i] = validInteger("Element " + (i + 1) + ":");
+            b[i] = validInteger("Element " + (i + 1) + ": ");
         }
         double manhattan = manhattanDistance(a, b);
         double euclidean = euclideanDistance(a, b);
@@ -1375,6 +1370,8 @@ public class Main {
         System.out.printf("Manhattan Distance: %.3f\n", manhattan);
         System.out.printf("Euclidean Distance: %.3f\n", euclidean);
         System.out.printf("Cosine Similarity: %.3f\n", cosinesim);
+
+        repeatOrReturn(Main::distanceBetweenArrays, "High School");
     }
 
     /**
