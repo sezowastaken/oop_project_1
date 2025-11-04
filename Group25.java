@@ -843,6 +843,10 @@ public class Group25 {
             return cleanedExpr.replaceFirst("-\\+", "-");
         }
 
+        if (cleanedExpr.matches("^\\+[0-9]+$")) {
+            return cleanedExpr.substring(1);
+        }
+
         for (int i = 0; i < cleanedExpr.length(); i++) {
             char c = cleanedExpr.charAt(i);
             if (c == '*' || c == '/') {
